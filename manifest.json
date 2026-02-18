@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "书签导航",
+  "name": "LiveMarksTab",
   "version": "1.0.0",
-  "description": "自定义新标签页书签导航，双向同步 Chrome 书签",
+  "description": "LiveMarksTab — 自定义新标签页书签导航，实时同步 Chrome 书签",
   "permissions": ["bookmarks", "favicon", "storage"],
   "chrome_url_overrides": {
     "newtab": "newtab.html"
