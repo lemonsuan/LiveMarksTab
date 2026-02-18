@@ -124,18 +124,29 @@ async function batchDeleteBookmarks(ids) {
 
 // ========== UI 逻辑 ==========
 
+/** 当前筛选状态：'all' | 'error' | 'timeout' */
+let _cleanerFilter = 'all';
+
 /** 打开清理面板 */
 function openCleanerPanel() {
   const overlay = document.getElementById('cleaner-overlay');
   overlay.classList.remove('hidden');
   requestAnimationFrame(() => overlay.classList.add('visible'));
+  _resetCleanerUI();
+}
 
-  // 重置状态
+function _resetCleanerUI() {
+  _cleanerFilter = 'all';
   document.getElementById('cleaner-results').innerHTML = '';
   document.getElementById('cleaner-progress').style.display = 'none';
-  document.getElementById('cleaner-actions').style.display = 'none';
+  document.getElementById('cleaner-bottom-bar').style.display = 'none';
   document.getElementById('cleaner-start').style.display = '';
-  document.getElementById('cleaner-summary').textContent = '';
+  document.getElementById('cleaner-stats').style.display = 'none';
+  document.getElementById('cleaner-filter-bar').style.display = 'none';
+  document.getElementById('cleaner-empty').style.display = 'none';
+  // 重置统计卡片
+  ['cleaner-stat-total','cleaner-stat-ok','cleaner-stat-error','cleaner-stat-timeout']
+    .forEach(id => { const el = document.getElementById(id); if(el) el.textContent = '—'; });
 }
 
 /** 关闭清理面板 */
@@ -145,64 +156,104 @@ function closeCleanerPanel() {
   setTimeout(() => overlay.classList.add('hidden'), 200);
 }
 
+/** 创建结果行 */
+function _createResultRow(item) {
+  const row = document.createElement('label');
+  row.className = 'cleaner-item';
+  row.dataset.status = item.status;
+  row.title = '双击在新标签页打开';
+  const statusLabel = item.status === 'error'
+    ? (item.code ? `HTTP ${item.code}` : '无法连接')
+    : '超时';
+  row.innerHTML = `
+    <input type="checkbox" checked data-id="${item.id}">
+    <img class="cleaner-favicon" src="${getFaviconUrl(item.url)}" width="16" height="16" alt="" onerror="this.style.visibility='hidden'">
+    <div class="cleaner-item-info">
+      <span class="cleaner-item-title">${item.title || '未命名'}</span>
+      <span class="cleaner-item-url">${item.url}</span>
+    </div>
+    <span class="cleaner-item-status ${item.status}">${statusLabel}</span>
+  `;
+  row.addEventListener('dblclick', (e) => {
+    e.preventDefault();
+    chrome.tabs.create({ url: item.url });
+  });
+  return row;
+}
+
+/** 应用筛选 */
+function _applyFilter(filter) {
+  _cleanerFilter = filter;
+  document.querySelectorAll('.cleaner-filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter);
+  });
+  document.querySelectorAll('#cleaner-results .cleaner-item').forEach(row => {
+    if (filter === 'all' || row.dataset.status === filter) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+}
+
 /** 开始扫描 */
 async function startScan() {
   const startBtn = document.getElementById('cleaner-start');
-  const progressBar = document.getElementById('cleaner-progress');
+  const progressWrap = document.getElementById('cleaner-progress');
   const progressFill = document.getElementById('cleaner-progress-fill');
   const progressText = document.getElementById('cleaner-progress-text');
   const resultsList = document.getElementById('cleaner-results');
-  const summary = document.getElementById('cleaner-summary');
-  const actions = document.getElementById('cleaner-actions');
+  const bottomBar = document.getElementById('cleaner-bottom-bar');
+  const statsEl = document.getElementById('cleaner-stats');
+  const filterBar = document.getElementById('cleaner-filter-bar');
+  const emptyEl = document.getElementById('cleaner-empty');
 
-  startBtn.style.display = 'none';
-  progressBar.style.display = '';
+  startBtn.disabled = true;
+  startBtn.textContent = '⏳ 扫描中…';
+  progressWrap.style.display = '';
   resultsList.innerHTML = '';
-  summary.textContent = '正在扫描…';
+  statsEl.style.display = '';
 
-  let errorCount = 0;
-  let timeoutCount = 0;
+  let totalCount = 0, okCount = 0, errorCount = 0, timeoutCount = 0;
 
   const results = await scanBookmarks((scanned, total, item) => {
+    totalCount = total;
     const pct = Math.round((scanned / total) * 100);
     progressFill.style.width = pct + '%';
     progressText.textContent = `${scanned} / ${total}`;
 
-    // 只显示有问题的
-    if (item.status === 'error' || item.status === 'timeout') {
-      if (item.status === 'error') errorCount++;
-      if (item.status === 'timeout') timeoutCount++;
-
-      const row = document.createElement('label');
-      row.className = 'cleaner-item';
-      row.title = '双击在新标签页打开';
-      row.innerHTML = `
-        <input type="checkbox" checked data-id="${item.id}">
-        <img src="${getFaviconUrl(item.url)}" width="16" height="16" alt="">
-        <span class="cleaner-item-title" title="${item.url}">${item.title}</span>
-        <span class="cleaner-item-status ${item.status}">${
-          item.status === 'error'
-            ? (item.code ? `HTTP ${item.code}` : '无法连接')
-            : '超时'
-        }</span>
-      `;
-      // 双击在新标签页打开（阻止 label 默认行为避免触发 checkbox）
-      row.addEventListener('dblclick', (e) => {
-        e.preventDefault();
-        chrome.tabs.create({ url: item.url });
-      });
-      resultsList.appendChild(row);
+    if (item.status === 'ok' || item.status === 'skip') {
+      okCount++;
+    } else if (item.status === 'error') {
+      errorCount++;
+      resultsList.appendChild(_createResultRow(item));
+    } else if (item.status === 'timeout') {
+      timeoutCount++;
+      resultsList.appendChild(_createResultRow(item));
     }
+
+    // 实时更新统计卡片
+    document.getElementById('cleaner-stat-total').textContent = total;
+    document.getElementById('cleaner-stat-ok').textContent = okCount;
+    document.getElementById('cleaner-stat-error').textContent = errorCount;
+    document.getElementById('cleaner-stat-timeout').textContent = timeoutCount;
   });
 
-  const problemCount = errorCount + timeoutCount;
-  progressBar.style.display = 'none';
-  summary.textContent = `扫描完成：共 ${results.length} 个书签，${problemCount} 个异常（${errorCount} 个不可访问，${timeoutCount} 个超时）`;
+  progressWrap.style.display = 'none';
+  startBtn.style.display = 'none';
 
-  if (problemCount > 0) {
-    actions.style.display = '';
+  const problemCount = errorCount + timeoutCount;
+
+  if (problemCount === 0) {
+    emptyEl.style.display = '';
   } else {
-    summary.textContent += '  🎉 所有书签均可正常访问！';
+    filterBar.style.display = '';
+    bottomBar.style.display = '';
+    // 更新筛选按钮数量
+    document.querySelector('[data-filter="all"] .filter-count').textContent = problemCount;
+    document.querySelector('[data-filter="error"] .filter-count').textContent = errorCount;
+    document.querySelector('[data-filter="timeout"] .filter-count').textContent = timeoutCount;
+    _applyFilter('all');
   }
 }
 
@@ -217,36 +268,57 @@ function initCleaner() {
   // 开始扫描
   document.getElementById('cleaner-start').addEventListener('click', startScan);
 
-  // 全选 / 取消全选
-  document.getElementById('cleaner-select-all').addEventListener('click', () => {
-    document.querySelectorAll('#cleaner-results input[type=checkbox]').forEach(cb => {
-      cb.checked = true;
-    });
+  // 筛选 Tab
+  document.getElementById('cleaner-filter-bar').addEventListener('click', (e) => {
+    const btn = e.target.closest('.cleaner-filter-btn');
+    if (btn) _applyFilter(btn.dataset.filter);
   });
 
+  // 快捷选择
+  document.getElementById('cleaner-select-all').addEventListener('click', () => {
+    document.querySelectorAll('#cleaner-results .cleaner-item:not([style*="display: none"]) input[type=checkbox]')
+      .forEach(cb => { cb.checked = true; });
+  });
   document.getElementById('cleaner-deselect-all').addEventListener('click', () => {
-    document.querySelectorAll('#cleaner-results input[type=checkbox]').forEach(cb => {
-      cb.checked = false;
-    });
+    document.querySelectorAll('#cleaner-results .cleaner-item:not([style*="display: none"]) input[type=checkbox]')
+      .forEach(cb => { cb.checked = false; });
+  });
+  document.getElementById('cleaner-select-error').addEventListener('click', () => {
+    _applyFilter('error');
+    document.querySelectorAll('#cleaner-results .cleaner-item input[type=checkbox]')
+      .forEach(cb => { cb.checked = cb.closest('.cleaner-item').dataset.status === 'error'; });
+  });
+  document.getElementById('cleaner-select-timeout').addEventListener('click', () => {
+    _applyFilter('timeout');
+    document.querySelectorAll('#cleaner-results .cleaner-item input[type=checkbox]')
+      .forEach(cb => { cb.checked = cb.closest('.cleaner-item').dataset.status === 'timeout'; });
   });
 
   // 删除选中
   document.getElementById('cleaner-delete-selected').addEventListener('click', async () => {
-    const checkboxes = document.querySelectorAll('#cleaner-results input[type=checkbox]:checked');
-    const ids = [...checkboxes].map(cb => cb.dataset.id);
-    if (ids.length === 0) {
-      showToast('没有选中任何书签');
-      return;
-    }
+    const checkboxes = [...document.querySelectorAll('#cleaner-results input[type=checkbox]:checked')];
+    const ids = checkboxes.map(cb => cb.dataset.id);
+    if (ids.length === 0) { showToast('没有选中任何书签'); return; }
     if (!confirm(`确定删除选中的 ${ids.length} 个书签吗？此操作不可撤销。`)) return;
 
     await batchDeleteBookmarks(ids);
     showToast(`已删除 ${ids.length} 个书签`);
-
-    // 移除已删除的行
     checkboxes.forEach(cb => cb.closest('.cleaner-item').remove());
 
-    // 刷新书签列表
+    // 更新统计
+    const remaining = document.querySelectorAll('#cleaner-results .cleaner-item').length;
+    document.querySelector('[data-filter="all"] .filter-count').textContent = remaining;
+    document.querySelector('[data-filter="error"] .filter-count').textContent =
+      document.querySelectorAll('#cleaner-results .cleaner-item[data-status="error"]').length;
+    document.querySelector('[data-filter="timeout"] .filter-count').textContent =
+      document.querySelectorAll('#cleaner-results .cleaner-item[data-status="timeout"]').length;
+
+    if (remaining === 0) {
+      document.getElementById('cleaner-filter-bar').style.display = 'none';
+      document.getElementById('cleaner-bottom-bar').style.display = 'none';
+      document.getElementById('cleaner-empty').style.display = '';
+    }
+
     await loadBookmarks();
   });
 }

@@ -575,10 +575,33 @@
     <!-- ========== 书签清理面板 ========== -->
     <div id="cleaner-overlay" class="settings-overlay hidden">
       <div class="cleaner-panel">
+        <!-- 标题栏 -->
         <div class="cleaner-panel-header">
           <span class="cleaner-panel-title">📡 书签可访问性检测</span>
           <button id="cleaner-close-btn" class="modal-close-btn">×</button>
         </div>
+
+        <!-- 统计卡片 -->
+        <div id="cleaner-stats" class="cleaner-stats" style="display: none">
+          <div class="cleaner-stat-card">
+            <span class="cleaner-stat-num" id="cleaner-stat-total">—</span>
+            <span class="cleaner-stat-label">总书签</span>
+          </div>
+          <div class="cleaner-stat-card ok">
+            <span class="cleaner-stat-num" id="cleaner-stat-ok">—</span>
+            <span class="cleaner-stat-label">✅ 正常</span>
+          </div>
+          <div class="cleaner-stat-card error">
+            <span class="cleaner-stat-num" id="cleaner-stat-error">—</span>
+            <span class="cleaner-stat-label">❌ 不可访问</span>
+          </div>
+          <div class="cleaner-stat-card timeout">
+            <span class="cleaner-stat-num" id="cleaner-stat-timeout">—</span>
+            <span class="cleaner-stat-label">⏱ 超时</span>
+          </div>
+        </div>
+
+        <!-- 扫描按钮 + 进度条 -->
         <div class="cleaner-panel-body">
           <button id="cleaner-start" class="cleaner-start-btn">
             🔍 开始扫描所有书签
@@ -598,21 +621,63 @@
               >0 / 0</span
             >
           </div>
-          <div id="cleaner-summary" class="cleaner-summary"></div>
-          <div id="cleaner-results" class="cleaner-results"></div>
+
+          <!-- 筛选 Tab -->
           <div
-            id="cleaner-actions"
-            class="cleaner-actions"
+            id="cleaner-filter-bar"
+            class="cleaner-filter-bar"
             style="display: none"
           >
-            <button id="cleaner-select-all" class="qr-action-btn">全选</button>
-            <button id="cleaner-deselect-all" class="qr-action-btn">
-              取消全选
+            <button class="cleaner-filter-btn active" data-filter="all">
+              全部异常 <span class="filter-count">0</span>
             </button>
-            <button id="cleaner-delete-selected" class="cleaner-delete-btn">
-              🗑️ 删除选中
+            <button class="cleaner-filter-btn" data-filter="error">
+              不可访问 <span class="filter-count">0</span>
+            </button>
+            <button class="cleaner-filter-btn" data-filter="timeout">
+              超时 <span class="filter-count">0</span>
             </button>
           </div>
+
+          <!-- 结果列表 -->
+          <div id="cleaner-results" class="cleaner-results"></div>
+
+          <!-- 全部正常空状态 -->
+          <div id="cleaner-empty" class="cleaner-empty" style="display: none">
+            🎉 所有书签均可正常访问！
+          </div>
+        </div>
+
+        <!-- 底部操作栏 -->
+        <div
+          id="cleaner-bottom-bar"
+          class="cleaner-bottom-bar"
+          style="display: none"
+        >
+          <div class="cleaner-quick-select">
+            <span class="cleaner-quick-label">快捷选择：</span>
+            <button id="cleaner-select-all" class="cleaner-quick-btn">
+              全选
+            </button>
+            <button id="cleaner-deselect-all" class="cleaner-quick-btn">
+              取消全选
+            </button>
+            <button
+              id="cleaner-select-error"
+              class="cleaner-quick-btn error-btn"
+            >
+              仅不可访问
+            </button>
+            <button
+              id="cleaner-select-timeout"
+              class="cleaner-quick-btn timeout-btn"
+            >
+              仅超时
+            </button>
+          </div>
+          <button id="cleaner-delete-selected" class="cleaner-delete-btn">
+            🗑️ 删除选中
+          </button>
         </div>
       </div>
     </div>
