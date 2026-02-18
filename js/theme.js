@@ -54,20 +54,11 @@ function initTheme() {
     applyColorScheme(color);
     applyBackground(bgType, bgValue);
   });
-
-  // 监听系统主题变化
-  darkModeQuery.addEventListener('change', (e) => {
-    chrome.storage.local.get('theme', (data) => {
-      if ((data.theme || 'light') === 'auto') {
-        document.documentElement.dataset.theme = e.matches ? 'dark' : 'light';
-      }
-    });
-  });
 }
 
 /**
  * 设置主题模式
- * @param {'auto'|'light'|'dark'} mode
+ * @param {'light'|'dark'} mode
  */
 function setTheme(mode) {
   applyTheme(mode);
@@ -75,14 +66,19 @@ function setTheme(mode) {
 }
 
 /**
- * 应用主题（不存储，仅设置 data-theme）
+ * 切换深浅模式（悬浮按钮使用）
+ */
+function toggleTheme() {
+  const current = document.documentElement.dataset.theme;
+  setTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+/**
+ * 应用主题 — 同时设置前景和默认背景色
+ * 用户自定义背景（builtin/url/upload）优先于主题默认背景
  */
 function applyTheme(mode) {
-  let resolved = mode;
-  if (mode === 'auto') {
-    resolved = darkModeQuery.matches ? 'dark' : 'light';
-  }
-  document.documentElement.dataset.theme = resolved;
+  document.documentElement.dataset.theme = mode;
 }
 
 /**

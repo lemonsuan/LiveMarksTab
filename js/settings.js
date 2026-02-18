@@ -11,7 +11,7 @@
  * 存储 (chrome.storage.local):
  *   layout: 'rows' | 'grid' | 'sidebar'
  *   searchEngine: 'google' | 'bing' | 'baidu' | 'duckduckgo' | 'github'
- *   theme: 'light' | 'dark' | 'auto'
+ *   theme: 'light' | 'dark'
  *   colorScheme: 'indigo' | 'emerald' | 'amber' | 'rose' | 'violet'
  *   bgType: 'none' | 'builtin' | 'url' | 'upload'
  *   bgValue: string
@@ -36,16 +36,36 @@ const DEFAULT_SETTINGS = {
  * 初始化设置面板
  */
 function initSettings() {
-  const settingsBtn = document.getElementById('settings-btn');
   const overlay = document.getElementById('settings-overlay');
   const closeBtn = document.getElementById('settings-close');
 
-  // 打开设置
-  settingsBtn.addEventListener('click', () => {
+  // ---- 悬浮工具栏按钮绑定 ----
+  // 设置按钮 → 打开设置面板
+  document.getElementById('btn-settings').addEventListener('click', () => {
     overlay.classList.remove('hidden');
     requestAnimationFrame(() => {
       overlay.classList.add('visible');
     });
+  });
+
+  // 深浅切换
+  document.getElementById('btn-theme-toggle').addEventListener('click', () => {
+    toggleTheme();
+  });
+
+  // 密码管理
+  document.getElementById('btn-passwords').addEventListener('click', () => {
+    chrome.tabs.create({ url: 'chrome://password-manager/passwords' });
+  });
+
+  // 浏览历史
+  document.getElementById('btn-history').addEventListener('click', () => {
+    chrome.tabs.create({ url: 'chrome://history' });
+  });
+
+  // 扩展管理
+  document.getElementById('btn-extensions').addEventListener('click', () => {
+    chrome.tabs.create({ url: 'chrome://extensions' });
   });
 
   // 关闭设置
@@ -108,16 +128,7 @@ function initSettings() {
     selectEngine(engineSelect.value);
   });
 
-  // ---- 主题模式切换 ----
-  document.querySelectorAll('.theme-option').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const mode = btn.dataset.theme;
-      setTheme(mode);
-      document.querySelectorAll('.theme-option').forEach(b => {
-        b.classList.toggle('active', b.dataset.theme === mode);
-      });
-    });
-  });
+  // (主题深浅切换已移至悬浮工具栏)
 
   // ---- 配色方案 ----
   const colorContainer = document.getElementById('color-options');
@@ -239,10 +250,7 @@ function loadSettings() {
       // 搜索引擎
       document.getElementById('setting-engine').value = engineId;
 
-      // 主题
-      document.querySelectorAll('.theme-option').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.theme === theme);
-      });
+      // (主题切换由悬浮栏控制，无需更新设置面板 UI)
 
       // 配色
       document.querySelectorAll('.color-dot').forEach(d => {
