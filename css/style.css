@@ -26,34 +26,37 @@
 /* ============================================
    1. CSS 变量 / 设计令牌 (Design Tokens V2)
    ============================================ */
+/* ============================================
+   1. CSS 变量 / 设计令牌 (TabMark Style - Clean & Emerald)
+   ============================================ */
 :root {
   /* ---- 字体系统 ---- */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   
-  /* ---- 调色板 (Tailwind/Radix 灵感) ---- */
-  /* 深色模式基底 */
-  --bg-primary: #0f172a;              /* 页底深蓝 */
-  --bg-secondary: #1e293b;            /* 搜索栏/侧栏 */
-  --bg-card: rgba(30, 41, 59, 0.7);   /* 卡片半透明 */
-  --bg-card-hover: rgba(51, 65, 85, 0.8);
-  --bg-input: rgba(15, 23, 42, 0.6);
-  --bg-overlay: rgba(0, 0, 0, 0.6);
+  /* ---- 调色板 (TabMark Palette) ---- */
+  /* 深色模式基底 (Deep Dark) */
+  --bg-primary: #1c1c1c;              /* TabMark 深色底 */
+  --bg-secondary: #242424;            /* 侧栏/搜索/弹窗 */
+  --bg-card: #242424;                 
+  --bg-card-hover: #2d2d2d;
+  --bg-input: #404040;
+  --bg-overlay: rgba(0, 0, 0, 0.7);
   
-  /* 玻璃拟态边框 (高光) */
-  --border: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.15);
-  --border-highlight: rgba(255, 255, 255, 0.2);
+  /* 边框 (Flat & Clean) */
+  --border: #404040;
+  --border-hover: #10b981;            /* 悬停变绿 */
+  --border-highlight: #10b981;
 
   /* 文字色阶 */
-  --text-primary: #f8fafc;            /* 亮白 */
-  --text-secondary: #94a3b8;          /* 灰蓝 */
-  --text-muted: #64748b;              /* 暗灰 */
+  --text-primary: #ffffff;            /* 纯白 */
+  --text-secondary: #a3a3a3;          /* Neutral-400 */
+  --text-muted: #737373;              /* Neutral-500 */
 
-  /* 主色调 (Indigo-500) */
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
-  --accent-subtle: rgba(99, 102, 241, 0.15);
-  --accent-glow: rgba(99, 102, 241, 0.4);
+  /* 主色调 (Emerald-500) */
+  --accent: #10b981;
+  --accent-hover: #059669;
+  --accent-subtle: rgba(16, 185, 129, 0.15);
+  --accent-glow: rgba(16, 185, 129, 0.4);
 
   /* 语义色 */
   --danger: #ef4444;
@@ -61,53 +64,53 @@
   --success: #10b981;
   --warning: #f59e0b;
 
-  /* ---- 阴影系统 (更细腻的层级) ---- */
+  /* ---- 阴影系统 (Subtle) ---- */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
   
   /* Ring Focus 光圈 */
   --ring-offset: 2px;
-  --ring-color: rgba(99, 102, 241, 0.5);
+  --ring-color: rgba(16, 185, 129, 0.5);
 
-  /* ---- 尺寸 & 倒角 ---- */
-  --search-area-height: 160px; /* 略增高，更通透 */
+  /* ---- 尺寸 & 倒角 (TabMark uses smaller radius) ---- */
+  --search-area-height: 140px;
   --sidebar-width: 240px;
-  --card-radius: 16px;         /* 更圆润 */
-  --radius-sm: 10px;
-  --radius-xs: 6px;
+  --card-radius: 8px;          /* 更方正 */
+  --radius-sm: 6px;
+  --radius-xs: 4px;
 
-  /* ---- 动效曲线 (Spring-like) ---- */
+  /* ---- 动效曲线 (Snappy) ---- */
   --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
   --ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
-  --transition-fast: 0.15s var(--ease-out);
-  --transition-normal: 0.3s var(--ease-out);
+  --transition-fast: 0.15s ease-out;
+  --transition-normal: 0.2s ease-out;
 }
 
 /* ============================================
-   1b. 浅色主题 (Light Mode - Modern Clean)
+   1b. 浅色主题 (Light Mode - TabMark Clean)
    ============================================ */
 [data-theme="light"] {
-  --bg-primary: #f8fafc;              /* 极淡灰蓝底 */
+  --bg-primary: #f9fafb;              /* Gray-50 */
   --bg-secondary: #ffffff;
-  --bg-card: rgba(255, 255, 255, 0.8);
-  --bg-card-hover: #ffffff;
-  --bg-input: #f1f5f9;
-  --bg-overlay: rgba(255, 255, 255, 0.8); /* 浅色遮罩 */
+  --bg-card: #ffffff;
+  --bg-card-hover: #f3f4f6;           /* Gray-100 */
+  --bg-input: #f3f4f6;
+  --bg-overlay: rgba(0, 0, 0, 0.3);
 
-  --border: rgba(148, 163, 184, 0.15);
-  --border-hover: rgba(148, 163, 184, 0.3);
-  --border-highlight: rgba(99, 102, 241, 0.3);
+  --border: #e5e7eb;                  /* Gray-200 */
+  --border-hover: #10b981;
+  --border-highlight: #10b981;
 
-  --text-primary: #1e293b;            /* 深蓝黑 */
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
+  --text-primary: #111827;            /* Gray-900 */
+  --text-secondary: #4b5563;          /* Gray-600 */
+  --text-muted: #9ca3af;              /* Gray-400 */
 
-  --shadow-sm: 0 1px 2px 0 rgba(7, 39, 74, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(7, 39, 74, 0.05), 0 2px 4px -1px rgba(7, 39, 74, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(7, 39, 74, 0.08), 0 4px 6px -2px rgba(7, 39, 74, 0.04);
-  --shadow-xl: 0 20px 25px -5px rgba(7, 39, 74, 0.1), 0 10px 10px -5px rgba(7, 39, 74, 0.04);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 /* ============================================
@@ -159,7 +162,7 @@ body.has-bg .row-section {
   background: var(--bg-card); /* 覆盖默认背景以配合玻璃 */
 }
 
-/* 默认行区块样式（圆角卡片风格） */
+/* 默认行区块样式（圆角卡片风格 - TabMark Style） */
 .row-section {
   background: var(--bg-card);
   border-radius: var(--card-radius);
@@ -170,7 +173,7 @@ body.has-bg .row-section {
 }
 
 .row-section:hover {
-  border-color: var(--border-highlight);
+  border-color: var(--border-hover); /* Emerald green */
   box-shadow: var(--shadow-md);
 }
 
@@ -435,12 +438,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  /* 毛玻璃顶栏 (Glassmorphism Header) */
-  background: var(--bg-card);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  mask-image: linear-gradient(to bottom, black 85%, transparent 100%); /* 底部微渐变融合 */
+  background: linear-gradient(180deg, var(--bg-primary) 60%, transparent);
   animation: fadeIn 0.4s ease;
 }
 
@@ -453,27 +451,20 @@ body {
 .search-box {
   display: flex;
   align-items: center;
-  /* 输入框更通透，叠加在 Header 上 */
-  background: rgba(255, 255, 255, 0.5); 
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--bg-secondary);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: 12px; /* Slightly smaller radius */
   padding: 0 6px 0 20px;
   height: 52px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: none; /* Remove default shadow for cleaner look */
   transition: all var(--transition-normal);
-}
-
-[data-theme="dark"] .search-box {
-  background: rgba(15, 23, 42, 0.5);
 }
 
 .search-box:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-subtle), var(--shadow-lg);
-  transform: translateY(-2px);
-  background: var(--bg-primary);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+  transform: translateY(-1px); /* Subtle lift */
+  background: var(--bg-secondary); /* Keep same bg */
 }
 
 #search-input {
@@ -522,22 +513,23 @@ body {
 /* ... (省略中间未变部分) ... */
 
 /* 分类卡片 */
+/* 分类卡片 (TabMark Style) */
 .bookmark-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--card-radius);
+  border-radius: var(--card-radius); /* 8px */
   overflow: hidden;
   break-inside: avoid;
   margin-bottom: 20px;
   transition: all var(--transition-normal);
   animation: fadeInUp 0.4s var(--ease-out) both;
-  backdrop-filter: blur(10px);
+  /* backdrop-filter removed for flat style */
 }
 
 .bookmark-card:hover {
-  border-color: var(--border-highlight);
-  box-shadow: var(--shadow-xl);
-  transform: translateY(-4px);
+  border-color: var(--border-hover); /* Emerald green */
+  box-shadow: var(--shadow-md);
+  transform: none; /* Remove lift effect */
   z-index: 10;
 }
 
@@ -872,6 +864,21 @@ body {
   }
 }
 
+/* 弹窗内容容器 */
+.modal-content {
+  background-color: var(--bg-secondary);
+  margin: 5% auto; /* 保持原位置 */
+  padding: 24px 32px;
+  border: 1px solid var(--border);
+  width: 90%;
+  max-width: 500px;
+  border-radius: 12px; /* TabMark style */
+  position: relative;
+  box-shadow: var(--shadow-xl);
+  animation: modalScaleIn 0.3s var(--ease-out);
+  /* backdrop-filter removed */
+}
+
 /* 二维码弹窗 */
 .qr-panel {
   background: var(--bg-card);
@@ -1037,39 +1044,46 @@ body {
 .sidebar-nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 10px 16px;
   cursor: pointer;
   color: var(--text-secondary);
   font-size: 14px;
+  font-weight: 500;
   transition: all var(--transition-fast);
-  border-left: 3px solid transparent;
-  margin-bottom: 2px;
+  border-radius: var(--radius-sm); /* TabMark style: rounded items */
+  margin-bottom: 4px;
+  border-left: none; /* Remove previous border indicator */
 }
 
 .sidebar-nav-item:hover {
   background: var(--bg-card-hover);
   color: var(--text-primary);
-  padding-left: 20px;
+  /* padding-left unchanged */
 }
 
 .sidebar-nav-item.active {
-  background: linear-gradient(90deg, var(--accent-subtle), transparent);
-  color: var(--accent);
-  border-left-color: var(--accent);
+  background: var(--accent-subtle); /* Light green bg */
+  color: var(--accent);             /* Emerald text */
   font-weight: 600;
+  border-left: none;
 }
 
 .sidebar-nav-item .nav-icon {
-  width: 18px;
-  height: 18px;
-  opacity: 0.7;
+  width: 20px;
+  height: 20px;
+  opacity: 0.8;
   transition: transform 0.2s ease;
 }
 
 .sidebar-nav-item:hover .nav-icon {
-  transform: scale(1.1);
+  transform: none; /* Remove scale effect for cleaner look */
   opacity: 1;
+}
+
+.sidebar-nav-item.active .nav-icon {
+  opacity: 1;
+  color: var(--accent);
 }
 
 .sidebar-content {
@@ -1280,39 +1294,46 @@ body {
 }
 
 .btn {
-  padding: 8px 20px;
-  border: none;
-  border-radius: var(--radius-xs);
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm); /* 6px */
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition:
-    background var(--transition-fast),
-    transform var(--transition-fast);
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .btn:active {
-  transform: scale(0.97);
+  transform: translateY(1px);
 }
 
 .btn-primary {
   background: var(--accent);
-  color: white;
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary:hover {
   background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-secondary {
   background: var(--bg-card);
   color: var(--text-secondary);
-  border: 1px solid var(--border);
+  border-color: var(--border);
 }
 
 .btn-secondary:hover {
   background: var(--bg-card-hover);
   color: var(--text-primary);
+  border-color: var(--border-hover);
 }
 
 /* ============================================
@@ -1905,7 +1926,6 @@ body {
   display: none !important;
 }
 
-/* 滚动条美化 */
 /* 滚动条美化 (Modern Minimalist) */
 ::-webkit-scrollbar {
   width: 6px;
