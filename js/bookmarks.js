@@ -223,6 +223,9 @@ function renderRowsLayout(folders) {
   folders.forEach(folder => {
     container.appendChild(createRowSection(folder));
   });
+
+  // 启用文件夹级别拖拽排序
+  enableFolderDrag(container);
 }
 
 /**
@@ -263,6 +266,9 @@ function createRowSection(folder) {
     grid.appendChild(link);
   });
   section.appendChild(grid);
+
+  // 启用书签项拖拽排序
+  enableBookmarkDrag(grid, folder.id);
 
   // 子文件夹也渲染为嵌套
   subFolders.forEach(sub => {
@@ -328,6 +334,9 @@ function createBookmarkLink(item) {
 
   a.appendChild(favicon);
   a.appendChild(title);
+
+  // 拖拽属性
+  a.draggable = true;
 
   // 右键菜单
   a.addEventListener('contextmenu', (e) => {
@@ -578,4 +587,156 @@ function showToast(message, duration = 2000) {
   toast.textContent = message;
   toast.classList.add('visible');
   setTimeout(() => toast.classList.remove('visible'), duration);
+}
+
+// ============================================
+// 拖拽排序
+// 支持书签项和文件夹区块的拖拽重排
+// 拖拽完成后通过 chrome.bookmarks.move() 同步到 Chrome
+// ============================================
+
+/**
+ * 启用书签项拖拽排序 =— 在 .row-items 容器内拖拽重排
+ * @param {HTMLElement} grid - .row-items 容器
+ * @param {string} folderId - 父文件夹 ID
+ */
+function enableBookmarkDrag(grid, folderId) {
+  let dragItem = null;
+
+  grid.addEventListener('dragstart', (e) => {
+    const item = e.target.closest('.bookmark-item');
+    if (!item) return;
+    dragItem = item;
+    item.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', item.dataset.id);
+  });
+
+  grid.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const target = e.target.closest('.bookmark-item');
+    if (!target || target === dragItem) return;
+
+    // 确定插入位置：前 or 后
+    const rect = target.getBoundingClientRect();
+    const midX = rect.left + rect.width / 2;
+    if (e.clientX < midX) {
+      grid.insertBefore(dragItem, target);
+    } else {
+      grid.insertBefore(dragItem, target.nextSibling);
+    }
+  });
+
+  grid.addEventListener('dragend', async (e) => {
+    if (!dragItem) return;
+    dragItem.classList.remove('dragging');
+
+    // 未分类文件夹不同步（虚拟文件夹，书签分属不同父节点）
+    if (folderId === '__uncategorized__') {
+      dragItem = null;
+      return;
+    }
+
+    // 计算新的索引
+    const items = [...grid.querySelectorAll('.bookmark-item')];
+    const id = dragItem.dataset.id;
+    const newIndex = items.findIndex(el => el.dataset.id === id);
+
+    dragItem = null;
+
+    if (newIndex >= 0) {
+      await writeBookmarkFromUI('move', id, { parentId: folderId, index: newIndex });
+    }
+  });
+}
+
+/**
+ * 启用文件夹区块拖拽排序 — 在 #layout-rows 内拖拽 .row-section
+ * @param {HTMLElement} container - #layout-rows 容器
+ */
+function enableFolderDrag(container) {
+  let dragSection = null;
+
+  container.addEventListener('dragstart', (e) => {
+    const section = e.target.closest('.row-section');
+    if (!section) return;
+    // 未分类不可拖
+    if (section.dataset.id === '__uncategorized__') {
+      e.preventDefault();
+      return;
+    }
+    // 只拖拽 header 拖柄，避免与书签拖拽冲突
+    const header = section.querySelector('.row-header');
+    if (!header || !header.contains(e.target)) return;
+
+    dragSection = section;
+    section.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/folder', section.dataset.id);
+  });
+
+  container.addEventListener('dragover', (e) => {
+    if (!dragSection) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const section = e.target.closest('.row-section');
+    if (!section || section === dragSection) return;
+    // 不能拖到未分类后面
+    if (section.dataset.id === '__uncategorized__') return;
+
+    const rect = section.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    if (e.clientY < midY) {
+      container.insertBefore(dragSection, section);
+    } else {
+      container.insertBefore(dragSection, section.nextSibling);
+    }
+  });
+
+  container.addEventListener('dragend', async (e) => {
+    if (!dragSection) return;
+    dragSection.classList.remove('dragging');
+
+    // 计算新顺序并同步到 Chrome
+    const sections = [...container.querySelectorAll('.row-section')];
+    const id = dragSection.dataset.id;
+    dragSection = null;
+
+    // 查找该文件夹在 Chrome 中的父节点
+    try {
+      const [node] = await chrome.bookmarks.get(id);
+      const parentId = node.parentId;
+
+      // 计算在同父中的新索引
+      // 获取同父的所有子节点，找到相邻文件夹的位置
+      const siblings = await chrome.bookmarks.getChildren(parentId);
+      const folderSiblings = siblings.filter(s => s.children !== undefined || !s.url);
+
+      // 找到 DOM 中前一个同父文件夹的位置作为参考
+      const sectionIndex = sections.findIndex(s => s.dataset.id === id);
+      let targetIndex = 0;
+
+      if (sectionIndex > 0) {
+        // 找前一个 section 在 Chrome 中的位置
+        const prevId = sections[sectionIndex - 1]?.dataset.id;
+        if (prevId && prevId !== '__uncategorized__') {
+          const prevSiblingIdx = siblings.findIndex(s => s.id === prevId);
+          targetIndex = prevSiblingIdx >= 0 ? prevSiblingIdx + 1 : 0;
+        }
+      }
+
+      await writeBookmarkFromUI('move', id, { parentId, index: targetIndex });
+    } catch (err) {
+      console.error('[Drag] 移动文件夹失败:', err);
+    }
+  });
+
+  // 设置 header 为拖柄
+  container.querySelectorAll('.row-section').forEach(section => {
+    if (section.dataset.id === '__uncategorized__') return;
+    section.setAttribute('draggable', 'true');
+    const header = section.querySelector('.row-header');
+    if (header) header.style.cursor = 'grab';
+  });
 }
