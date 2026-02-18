@@ -435,7 +435,12 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: linear-gradient(180deg, var(--bg-primary) 60%, transparent);
+  /* 毛玻璃顶栏 (Glassmorphism Header) */
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  mask-image: linear-gradient(to bottom, black 85%, transparent 100%); /* 底部微渐变融合 */
   animation: fadeIn 0.4s ease;
 }
 
@@ -448,13 +453,20 @@ body {
 .search-box {
   display: flex;
   align-items: center;
-  background: var(--bg-secondary);
+  /* 输入框更通透，叠加在 Header 上 */
+  background: rgba(255, 255, 255, 0.5); 
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 0 6px 0 20px;
   height: 52px;
   box-shadow: var(--shadow-sm);
   transition: all var(--transition-normal);
+}
+
+[data-theme="dark"] .search-box {
+  background: rgba(15, 23, 42, 0.5);
 }
 
 .search-box:focus-within {
