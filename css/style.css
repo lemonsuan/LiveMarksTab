@@ -555,16 +555,15 @@ body {
   display: block;
 }
 
-/* ---------- 布局 A: 平铺网格 ---------- */
+/* ---------- 布局 A: 瀑布流网格 ---------- */
 #layout-grid {
   display: none;
-  gap: 20px;
 }
 
 #layout-grid.active {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  align-items: start;
+  display: block;
+  columns: 280px;
+  column-gap: 20px;
 }
 
 /* 分类卡片 */
@@ -573,6 +572,8 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--card-radius);
   overflow: hidden;
+  break-inside: avoid;
+  margin-bottom: 20px;
   transition:
     border-color var(--transition-normal),
     box-shadow var(--transition-normal),
@@ -896,14 +897,9 @@ body {
 }
 
 .row-items {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 4px;
-}
-
-.row-items > .bookmark-item,
-.row-items > .folder-card {
-  width: 180px;
 }
 
 /* 行布局中隐藏超出6行的项目 */
