@@ -284,6 +284,9 @@ function createRowSection(folder) {
   });
   section.appendChild(grid);
 
+  // 启用书签项拖拽排序
+  enableBookmarkDrag(grid, folder.id);
+
   // 「更多」按钮
   if (hasMore) {
     const moreBtn = createElement('button', { className: 'row-more-btn' });
@@ -694,6 +697,7 @@ function enableBookmarkDrag(grid, folderId) {
   });
 
   grid.addEventListener('dragover', (e) => {
+    if (!dragItem) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     const target = e.target.closest('.bookmark-item');
