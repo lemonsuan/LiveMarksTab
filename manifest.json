@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "LiveMarksTab — 自定义新标签页书签导航，实时同步 Chrome 书签",
   "permissions": ["bookmarks", "favicon", "storage"],
+  "host_permissions": ["<all_urls>"],
   "chrome_url_overrides": {
     "newtab": "newtab.html"
   },

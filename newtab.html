@@ -538,6 +538,22 @@
           />
         </svg>
       </button>
+      <!-- 书签清理 -->
+      <button id="btn-cleaner" class="float-btn" title="书签清理">
+        <svg
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path
+            d="M9 2l.27 1.63A7 7 0 0 0 5.16 7H3v2h1.29a7 7 0 0 0 0 6H3v2h2.16a7 7 0 0 0 4.11 3.37L9 22h6l-.27-1.63A7 7 0 0 0 18.84 17H21v-2h-1.29a7 7 0 0 0 0-6H21V7h-2.16a7 7 0 0 0-4.11-3.37L15 2H9z"
+          />
+          <circle cx="12" cy="12" r="3" />
+        </svg>
+      </button>
       <!-- 设置 -->
       <button id="btn-settings" class="float-btn" title="设置">
         <svg
@@ -556,6 +572,51 @@
       </button>
     </div>
 
+    <!-- ========== 书签清理面板 ========== -->
+    <div id="cleaner-overlay" class="settings-overlay hidden">
+      <div class="cleaner-panel">
+        <div class="cleaner-panel-header">
+          <span class="cleaner-panel-title">📡 书签可访问性检测</span>
+          <button id="cleaner-close-btn" class="modal-close-btn">×</button>
+        </div>
+        <div class="cleaner-panel-body">
+          <button id="cleaner-start" class="cleaner-start-btn">
+            🔍 开始扫描所有书签
+          </button>
+          <div
+            id="cleaner-progress"
+            class="cleaner-progress"
+            style="display: none"
+          >
+            <div class="cleaner-progress-bar">
+              <div
+                id="cleaner-progress-fill"
+                class="cleaner-progress-fill"
+              ></div>
+            </div>
+            <span id="cleaner-progress-text" class="cleaner-progress-text"
+              >0 / 0</span
+            >
+          </div>
+          <div id="cleaner-summary" class="cleaner-summary"></div>
+          <div id="cleaner-results" class="cleaner-results"></div>
+          <div
+            id="cleaner-actions"
+            class="cleaner-actions"
+            style="display: none"
+          >
+            <button id="cleaner-select-all" class="qr-action-btn">全选</button>
+            <button id="cleaner-deselect-all" class="qr-action-btn">
+              取消全选
+            </button>
+            <button id="cleaner-delete-selected" class="cleaner-delete-btn">
+              🗑️ 删除选中
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ========== JS 模块（顺序有依赖，不可调换） ========== -->
     <!-- 1. 工具函数：createElement, getFaviconUrl, debounce, SVG图标 -->
     <script src="js/utils.js"></script>
@@ -567,6 +628,8 @@
     <script src="js/qrcode.js"></script>
     <!-- 3. 书签核心：loadBookmarks + 三种布局渲染 + 右键菜单 + 编辑弹窗 -->
     <script src="js/bookmarks.js"></script>
+    <!-- 3.5 书签清理模块 -->
+    <script src="js/cleaner.js"></script>
     <!-- 4. 双向同步：Sync Lock + registerBookmarkListeners -->
     <script src="js/sync.js"></script>
     <!-- 5. 设置面板：布局切换 + 引擎选择 + 持久化 -->

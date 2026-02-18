@@ -29,6 +29,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 4. 初始化编辑弹窗（绑定弹窗内的保存/取消/关闭事件）
   initEditDialog();
 
+  // 4.5 初始化书签清理面板
+  initCleaner();
+
   // 5. 读取 Chrome 书签并渲染到三种布局容器
   await loadBookmarks();
 

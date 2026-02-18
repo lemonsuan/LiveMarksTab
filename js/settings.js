@@ -68,6 +68,11 @@ function initSettings() {
     chrome.tabs.create({ url: 'chrome://extensions' });
   });
 
+  // 书签清理
+  document.getElementById('btn-cleaner').addEventListener('click', () => {
+    openCleanerPanel();
+  });
+
   // 关闭设置
   const closeSettings = () => {
     overlay.classList.remove('visible');
