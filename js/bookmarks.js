@@ -491,15 +491,18 @@ function showContextMenu(x, y, target) {
   // 根据类型显示/隐藏菜单项
   const openItem = menu.querySelector('[data-action="open"]');
   const openNewItem = menu.querySelector('[data-action="open-new"]');
+  const qrcodeItem = menu.querySelector('[data-action="qrcode"]');
   const urlGroup = document.getElementById('edit-url-group');
 
   if (target.type === 'folder') {
     openItem.style.display = 'none';
     openNewItem.style.display = 'none';
+    qrcodeItem.style.display = 'none';
     if (urlGroup) urlGroup.style.display = 'none';
   } else {
     openItem.style.display = '';
     openNewItem.style.display = '';
+    qrcodeItem.style.display = '';
     if (urlGroup) urlGroup.style.display = '';
   }
 
@@ -578,7 +581,73 @@ async function handleContextAction(action, target) {
         }
       }
       break;
+
+    case 'qrcode':
+      if (target.url) showQRCodePanel(target.url, target.title);
+      break;
   }
+}
+
+/**
+ * 显示二维码弹窗
+ */
+function showQRCodePanel(url, title) {
+  const overlay = document.getElementById('qr-overlay');
+  const canvas = document.getElementById('qr-canvas');
+  const urlEl = document.getElementById('qr-url');
+
+  // 生成二维码
+  try {
+    generateQRCode(canvas, url, 200);
+  } catch (err) {
+    showToast('二维码生成失败: ' + err.message);
+    return;
+  }
+
+  // 显示网址
+  urlEl.textContent = url;
+  urlEl.title = url;
+
+  // 显示弹窗
+  overlay.classList.remove('hidden');
+  requestAnimationFrame(() => overlay.classList.add('visible'));
+
+  // 关闭按钮
+  document.getElementById('qr-close-btn').onclick = () => {
+    overlay.classList.remove('visible');
+    setTimeout(() => overlay.classList.add('hidden'), 200);
+  };
+
+  // 点击遮罩关闭
+  overlay.onclick = (e) => {
+    if (e.target === overlay) {
+      overlay.classList.remove('visible');
+      setTimeout(() => overlay.classList.add('hidden'), 200);
+    }
+  };
+
+  // 复制二维码图片
+  document.getElementById('qr-copy-image').onclick = async () => {
+    try {
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob })
+      ]);
+      showToast('二维码已复制到剪贴板');
+    } catch (err) {
+      showToast('复制失败: ' + err.message);
+    }
+  };
+
+  // 复制网址
+  document.getElementById('qr-copy-url').onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      showToast('网址已复制到剪贴板');
+    } catch (err) {
+      showToast('复制失败: ' + err.message);
+    }
+  };
 }
 
 // ============================================

@@ -151,6 +151,46 @@
         </svg>
         <span>编辑书签</span>
       </div>
+      <div class="context-menu-item" data-action="qrcode">
+        <svg viewBox="0 0 24 24" width="14" height="14">
+          <rect
+            x="3"
+            y="3"
+            width="7"
+            height="7"
+            rx="1"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+          <rect
+            x="14"
+            y="3"
+            width="7"
+            height="7"
+            rx="1"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+          <rect
+            x="3"
+            y="14"
+            width="7"
+            height="7"
+            rx="1"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          />
+          <rect x="14" y="14" width="4" height="4" fill="currentColor" />
+          <rect x="19" y="19" width="2" height="2" fill="currentColor" />
+          <rect x="14" y="19" width="2" height="2" fill="currentColor" />
+          <rect x="19" y="14" width="2" height="2" fill="currentColor" />
+        </svg>
+        <span>生成二维码</span>
+      </div>
+      <div class="context-menu-divider"></div>
       <div class="context-menu-item" data-action="delete">
         <svg viewBox="0 0 24 24" width="14" height="14">
           <polyline
@@ -173,6 +213,28 @@
           />
         </svg>
         <span>删除</span>
+      </div>
+    </div>
+
+    <!-- ========== 二维码弹窗 ========== -->
+    <div id="qr-overlay" class="settings-overlay hidden">
+      <div class="qr-panel">
+        <div class="qr-panel-header">
+          <span class="qr-panel-title">二维码</span>
+          <button id="qr-close-btn" class="modal-close-btn">×</button>
+        </div>
+        <div class="qr-panel-body">
+          <div class="qr-image-wrap">
+            <canvas id="qr-canvas" width="200" height="200"></canvas>
+          </div>
+          <div class="qr-url" id="qr-url"></div>
+          <div class="qr-actions">
+            <button id="qr-copy-image" class="qr-action-btn">
+              📋 复制二维码
+            </button>
+            <button id="qr-copy-url" class="qr-action-btn">🔗 复制网址</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -501,6 +563,8 @@
     <script src="js/theme.js"></script>
     <!-- 2. 搜索：SEARCH_ENGINES 常量 + initSearch + filterBookmarks -->
     <script src="js/search.js"></script>
+    <!-- 2.5 二维码生成器（纯 Canvas，无外部依赖） -->
+    <script src="js/qrcode.js"></script>
     <!-- 3. 书签核心：loadBookmarks + 三种布局渲染 + 右键菜单 + 编辑弹窗 -->
     <script src="js/bookmarks.js"></script>
     <!-- 4. 双向同步：Sync Lock + registerBookmarkListeners -->
