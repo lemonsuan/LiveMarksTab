@@ -24,80 +24,90 @@
  */
 
 /* ============================================
-   1. CSS 变量 / 设计令牌
-   修改主题色只需修改这里的变量值
+   1. CSS 变量 / 设计令牌 (Design Tokens V2)
    ============================================ */
 :root {
-  /* ---- 背景色阶（沉稳深蓝 · ui-ux-pro-max 推荐） ---- */
-  --bg-primary: #0F172A;              /* 页面最底层 — 深墨蓝 */
-  --bg-secondary: #1E293B;            /* 搜索框 / 设置面板 */
-  --bg-card: #1E293B;                 /* 卡片 / 菜单 / 弹窗 */
-  --bg-card-hover: #334155;           /* 悬停态 */
-  --bg-input: #1E293B;                /* 输入框 */
-  --bg-overlay: rgba(0, 0, 0, 0.55);  /* 弹窗遮罩 */
+  /* ---- 字体系统 ---- */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  
+  /* ---- 调色板 (Tailwind/Radix 灵感) ---- */
+  /* 深色模式基底 */
+  --bg-primary: #0f172a;              /* 页底深蓝 */
+  --bg-secondary: #1e293b;            /* 搜索栏/侧栏 */
+  --bg-card: rgba(30, 41, 59, 0.7);   /* 卡片半透明 */
+  --bg-card-hover: rgba(51, 65, 85, 0.8);
+  --bg-input: rgba(15, 23, 42, 0.6);
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+  
+  /* 玻璃拟态边框 (高光) */
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
+  --border-highlight: rgba(255, 255, 255, 0.2);
 
-  /* ---- 文字色阶 ---- */
-  --text-primary: #F8FAFC;            /* 标题、重要文字 */
-  --text-secondary: #94A3B8;          /* 正文、次要内容 */
-  --text-muted: #64748B;              /* 提示、占位符 */
+  /* 文字色阶 */
+  --text-primary: #f8fafc;            /* 亮白 */
+  --text-secondary: #94a3b8;          /* 灰蓝 */
+  --text-muted: #64748b;              /* 暗灰 */
 
-  /* ---- 主色调 (Indigo) ---- */
+  /* 主色调 (Indigo-500) */
   --accent: #6366f1;
   --accent-hover: #818cf8;
-  --accent-subtle: rgba(99, 102, 241, 0.12);
+  --accent-subtle: rgba(99, 102, 241, 0.15);
+  --accent-glow: rgba(99, 102, 241, 0.4);
 
-  /* ---- 语义色 ---- */
+  /* 语义色 */
   --danger: #ef4444;
-  --danger-subtle: rgba(239, 68, 68, 0.12);
-  --success: #22c55e;
+  --danger-bg: rgba(239, 68, 68, 0.1);
+  --success: #10b981;
+  --warning: #f59e0b;
 
-  /* ---- 边框 ---- */
-  --border: rgba(255, 255, 255, 0.06);
-  --border-hover: rgba(255, 255, 255, 0.10);
+  /* ---- 阴影系统 (更细腻的层级) ---- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.15);
+  
+  /* Ring Focus 光圈 */
+  --ring-offset: 2px;
+  --ring-color: rgba(99, 102, 241, 0.5);
 
-  /* ---- 阴影 ---- */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.45);
-
-  /* ---- 尺寸 ---- */
-  --search-area-height: 140px;
-  --sidebar-width: 220px;
-  --card-radius: 10px;
-  --radius-sm: 8px;
+  /* ---- 尺寸 & 倒角 ---- */
+  --search-area-height: 160px; /* 略增高，更通透 */
+  --sidebar-width: 240px;
+  --card-radius: 16px;         /* 更圆润 */
+  --radius-sm: 10px;
   --radius-xs: 6px;
 
-  /* ---- 过渡时间 ---- */
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.25s ease;
+  /* ---- 动效曲线 (Spring-like) ---- */
+  --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --transition-fast: 0.15s var(--ease-out);
+  --transition-normal: 0.3s var(--ease-out);
 }
 
 /* ============================================
-   1b. 浅色主题变量覆盖
-   通过 <html data-theme="light"> 切换，只需修改颜色变量
+   1b. 浅色主题 (Light Mode - Modern Clean)
    ============================================ */
 [data-theme="light"] {
-  /* ---- 背景色阶 (Notion 风格 · 暖白) ---- */
-  --bg-primary: #FFFFFF;              /* 干净白底 */
-  --bg-secondary: #FFFFFF;            /* 面板/搜索用同色白 */
-  --bg-card: #FFFFFF;                 /* 卡片 */
-  --bg-card-hover: #F7F6F3;           /* 悬停 — Notion 标志性暖灰 */
-  --bg-input: #F7F6F3;                /* 输入框底色 */
-  --bg-overlay: rgba(15, 15, 15, 0.6); /* 遮罩 — Notion 用深灰 */
+  --bg-primary: #f8fafc;              /* 极淡灰蓝底 */
+  --bg-secondary: #ffffff;
+  --bg-card: rgba(255, 255, 255, 0.8);
+  --bg-card-hover: #ffffff;
+  --bg-input: #f1f5f9;
+  --bg-overlay: rgba(255, 255, 255, 0.8); /* 浅色遮罩 */
 
-  /* ---- 文字色阶 (Notion 标准) ---- */
-  --text-primary: #37352F;            /* 主文字 — Notion 正文色 */
-  --text-secondary: #787774;          /* 次要文字 */
-  --text-muted: #B4B4B0;              /* 提示/占位符 */
+  --border: rgba(148, 163, 184, 0.15);
+  --border-hover: rgba(148, 163, 184, 0.3);
+  --border-highlight: rgba(99, 102, 241, 0.3);
 
-  /* ---- 边框 (极淡) ---- */
-  --border: rgba(55, 53, 47, 0.09);   /* 几乎不可见 */
-  --border-hover: rgba(55, 53, 47, 0.16);
+  --text-primary: #1e293b;            /* 深蓝黑 */
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
 
-  /* ---- 阴影 ---- */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 3px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 2px 0 rgba(7, 39, 74, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(7, 39, 74, 0.05), 0 2px 4px -1px rgba(7, 39, 74, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(7, 39, 74, 0.08), 0 4px 6px -2px rgba(7, 39, 74, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(7, 39, 74, 0.1), 0 10px 10px -5px rgba(7, 39, 74, 0.04);
 }
 
 /* ============================================
@@ -362,13 +372,19 @@ body.has-bg .row-section {
 }
 
 body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: var(--font-sans);
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+::selection {
+  background: var(--accent-subtle);
+  color: var(--accent);
 }
 
 /* ============================================
@@ -423,14 +439,15 @@ body {
   border-radius: 16px;
   padding: 0 6px 0 20px;
   height: 52px;
-  transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
 }
 
 .search-box:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-subtle);
+  box-shadow: 0 0 0 4px var(--accent-subtle), var(--shadow-lg);
+  transform: translateY(-2px);
+  background: var(--bg-primary);
 }
 
 #search-input {
@@ -441,10 +458,12 @@ body {
   font-size: 15px;
   color: var(--text-primary);
   caret-color: var(--accent);
+  font-weight: 500;
 }
 
 #search-input::placeholder {
   color: var(--text-muted);
+  font-weight: 400;
 }
 
 /* 搜索引擎切换 */
@@ -457,21 +476,94 @@ body {
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  border: none;
+  border: 1px solid transparent;
   border-radius: 10px;
   background: var(--bg-card);
   color: var(--text-secondary);
   cursor: pointer;
   font-size: 13px;
   white-space: nowrap;
-  transition:
-    background var(--transition-fast),
-    color var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 #engine-btn:hover {
   background: var(--bg-card-hover);
   color: var(--text-primary);
+  border-color: var(--border-hover);
+  transform: scale(1.02);
+}
+
+/* ... (省略中间未变部分) ... */
+
+/* 分类卡片 */
+.bookmark-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  break-inside: avoid;
+  margin-bottom: 20px;
+  transition: all var(--transition-normal);
+  animation: fadeInUp 0.4s var(--ease-out) both;
+  backdrop-filter: blur(10px);
+}
+
+.bookmark-card:hover {
+  border-color: var(--border-highlight);
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-4px);
+  z-index: 10;
+}
+
+/* ... (省略卡片动画延迟) ... */
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+}
+
+.card-header .folder-icon {
+  margin-right: 8px;
+  opacity: 0.7;
+  color: var(--accent);
+}
+
+.card-body {
+  padding: 8px;
+}
+
+/* 6. 通用书签链接项 — 三种布局共用 */
+.bookmark-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  transition: all var(--transition-fast);
+  overflow: hidden;
+  border: 1px solid transparent;
+}
+
+.bookmark-item:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  transform: translateX(4px);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.bookmark-item:active {
+  transform: translateX(4px) scale(0.98);
 }
 
 #engine-icon {
@@ -737,12 +829,13 @@ body {
 /* 二维码弹窗 */
 .qr-panel {
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-highlight);
   border-radius: var(--card-radius);
   width: 280px;
   padding: 20px;
-  box-shadow: var(--shadow-lg);
-  animation: fadeInUp 0.2s ease both;
+  box-shadow: var(--shadow-xl);
+  animation: scaleIn 0.3s var(--ease-out) both;
+  backdrop-filter: blur(16px);
 }
 
 .qr-panel-header {
@@ -898,33 +991,39 @@ body {
 .sidebar-nav-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: var(--radius-xs);
+  gap: 10px;
+  padding: 10px 16px;
   cursor: pointer;
-  font-size: 13px;
   color: var(--text-secondary);
-  transition:
-    background var(--transition-fast),
-    color var(--transition-fast);
-  user-select: none;
+  font-size: 14px;
+  transition: all var(--transition-fast);
+  border-left: 3px solid transparent;
+  margin-bottom: 2px;
 }
 
 .sidebar-nav-item:hover {
-  background: var(--accent-subtle);
+  background: var(--bg-card-hover);
   color: var(--text-primary);
+  padding-left: 20px;
 }
 
 .sidebar-nav-item.active {
-  background: var(--accent-subtle);
+  background: linear-gradient(90deg, var(--accent-subtle), transparent);
   color: var(--accent);
-  font-weight: 500;
+  border-left-color: var(--accent);
+  font-weight: 600;
 }
 
 .sidebar-nav-item .nav-icon {
-  width: 16px;
-  height: 16px;
-  opacity: 0.6;
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-nav-item:hover .nav-icon {
+  transform: scale(1.1);
+  opacity: 1;
 }
 
 .sidebar-content {
@@ -1175,41 +1274,48 @@ body {
    ============================================ */
 .float-toolbar {
   position: fixed;
-  right: 20px;
+  right: 24px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  z-index: 90;
-  animation: fadeIn 0.5s ease 0.3s both;
+  gap: 12px;
+  z-index: 50;
+  padding: 12px 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(12px);
+  animation: fadeIn 0.5s ease 0.2s both;
 }
 
 .float-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-secondary);
-  color: var(--text-muted);
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition:
-    background var(--transition-fast),
-    color var(--transition-fast),
-    border-color var(--transition-fast);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
 }
 
 .float-btn:hover {
-  background: var(--bg-card-hover);
-  color: var(--text-primary);
-  border-color: var(--border-hover);
+  background: var(--accent);
+  color: #fff;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px var(--accent-glow);
+  border-color: transparent;
 }
 
 .float-btn:active {
-  transform: scale(0.92);
+  transform: scale(0.95);
 }
 
 /* ============================================
@@ -1222,6 +1328,7 @@ body {
   position: fixed;
   inset: 0;
   background: var(--bg-overlay);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1238,17 +1345,19 @@ body {
 
 .settings-panel {
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-highlight);
   border-radius: var(--card-radius);
   width: 560px;
   max-width: 90vw;
-  box-shadow: var(--shadow-lg);
-  transform: translateY(20px) scale(0.98);
-  transition: transform var(--transition-normal);
+  box-shadow: var(--shadow-xl);
+  transform: scale(0.95);
+  opacity: 0;
+  transition: all var(--transition-normal);
 }
 
 .settings-overlay.visible .settings-panel {
-  transform: translateY(0) scale(1);
+  transform: scale(1);
+  opacity: 1;
 }
 
 .settings-header {
@@ -1402,16 +1511,18 @@ body {
    ============================================ */
 .cleaner-panel {
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-highlight);
   border-radius: var(--card-radius);
   width: 720px;
   max-width: 95vw;
   max-height: 88vh;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-lg);
-  animation: fadeInUp 0.25s ease both;
+  box-shadow: var(--shadow-xl);
+  /* 复用 overlay 的 transition 机制，这里不再独立设置 animation，而是跟随 mount */
+  animation: scaleIn 0.3s var(--ease-out) both;
   overflow: hidden;
+  backdrop-filter: blur(16px);
 }
 
 .cleaner-panel-header {
@@ -1749,8 +1860,10 @@ body {
 }
 
 /* 滚动条美化 */
+/* 滚动条美化 (Modern Minimalist) */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -1758,12 +1871,19 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-hover);
-  border-radius: 3px;
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 4px;
+  border: 1px solid transparent;
+  background-clip: content-box;
+  transition: background var(--transition-fast);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: rgba(156, 163, 175, 0.5);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 /* ============================================

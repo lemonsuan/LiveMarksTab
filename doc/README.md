@@ -9,6 +9,7 @@
 | [phase1-核心功能与UI美化.md](phase1-核心功能与UI美化.md) | Phase 1 + 1.5 | 2026-02-18 | ✅ 完成 |
 | [phase2-功能优化.md](phase2-功能优化.md) | Phase 2 | 2026-02-18 | ✅ 完成 |
 | [phase4-高级功能.md](phase4-高级功能.md) | Phase 4 | 2026-02-18 | ✅ 完成 |
+| [phase5-ui-polishing.md](phase5-ui-polishing.md) | Phase 5 | 2026-02-18 | ✅ 完成 |
 
 ## Git 提交历史
 
