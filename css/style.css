@@ -151,34 +151,71 @@ body.has-bg .row-section {
 }
 
 /* ============================================
-   1d. 设置面板 Tab 切换样式
+   1d. 设置面板侧栏 Tab 布局
    ============================================ */
-.settings-tabs {
+.settings-layout {
   display: flex;
-  border-bottom: 1px solid var(--border);
-  padding: 0 20px;
+  min-height: 300px;
+}
+
+.settings-sidebar {
+  width: 110px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  padding: 12px 0;
 }
 
 .settings-tab {
-  padding: 10px 16px;
+  padding: 8px 16px;
   border: none;
   background: none;
   color: var(--text-muted);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  transition: color var(--transition-fast), border-color var(--transition-fast);
+  text-align: left;
+  border-right: 2px solid transparent;
+  transition: color var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
 }
 
 .settings-tab:hover {
   color: var(--text-primary);
+  background: var(--bg-card-hover);
 }
 
 .settings-tab.active {
   color: var(--accent);
-  border-bottom-color: var(--accent);
+  border-right-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.settings-sidebar-spacer {
+  flex: 1;
+}
+
+.settings-reset-btn {
+  margin: 8px 12px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.settings-reset-btn:hover {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.settings-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
 }
 
 .settings-tab-content {
@@ -190,42 +227,6 @@ body.has-bg .row-section {
 }
 
 /* ---- 外观设置内的特殊组件 ---- */
-
-/* 主题模式切换按钮组 */
-.theme-options {
-  display: flex;
-  gap: 8px;
-}
-
-.theme-option {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--bg-card);
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-size: 12px;
-  transition:
-    border-color var(--transition-fast),
-    color var(--transition-fast),
-    background var(--transition-fast);
-}
-
-.theme-option:hover {
-  border-color: var(--border-hover);
-  color: var(--text-primary);
-}
-
-.theme-option.active {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-subtle);
-}
 
 /* 配色方案圆点选择器 */
 .color-options {
@@ -1056,7 +1057,7 @@ body {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--card-radius);
-  width: 440px;
+  width: 560px;
   max-width: 90vw;
   box-shadow: var(--shadow-lg);
   transform: translateY(20px) scale(0.98);
@@ -1096,9 +1097,7 @@ body {
   transform: rotate(90deg);
 }
 
-.settings-body {
-  padding: 20px;
-}
+/* .settings-body 已被 .settings-content 替代 */
 
 .setting-group {
   margin-bottom: 20px;

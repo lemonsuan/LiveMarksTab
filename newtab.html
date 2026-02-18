@@ -214,181 +214,192 @@
 
     <!-- ========== 设置浮层 ========== -->
     <div id="settings-overlay" class="settings-overlay hidden">
-      <div class="settings-panel" style="width: 480px">
+      <div class="settings-panel">
         <div class="settings-header">
           <h2>设置</h2>
           <button id="settings-close" class="settings-close" title="关闭">
             &times;
           </button>
         </div>
-        <!-- Tab 导航 -->
-        <div class="settings-tabs">
-          <button class="settings-tab active" data-tab="appearance">
-            外观
-          </button>
-          <button class="settings-tab" data-tab="layout">布局</button>
-          <button class="settings-tab" data-tab="search">搜索引擎</button>
-        </div>
-        <div class="settings-body">
-          <!-- Tab 1: 外观 -->
-          <div class="settings-tab-content active" data-tab="appearance">
-            <!-- 主题深浅切换已移至悬浮工具栏 -->
-            <!-- 配色方案 -->
-            <div class="setting-group">
-              <label class="setting-label">配色方案</label>
-              <div class="color-options" id="color-options">
-                <!-- JS 动态生成 -->
-              </div>
-            </div>
-            <!-- 背景图 -->
-            <div class="setting-group">
-              <label class="setting-label">背景图</label>
-              <div class="bg-options" id="bg-options">
-                <!-- JS 动态生成 -->
-              </div>
-              <!-- URL 输入 -->
-              <div class="bg-url-row">
-                <input
-                  type="url"
-                  id="bg-url-input"
-                  placeholder="输入图片网址..."
-                />
-                <button id="bg-url-apply">应用</button>
-              </div>
-              <!-- 上传按钮 -->
-              <div class="bg-upload-row">
-                <button class="bg-upload-btn" id="bg-upload-btn">
-                  上传本地图片
-                </button>
-                <input
-                  type="file"
-                  id="bg-file-input"
-                  accept="image/*"
-                  style="display: none"
-                />
-              </div>
-            </div>
+        <div class="settings-layout">
+          <!-- 左侧 Tab 导航 -->
+          <div class="settings-sidebar">
+            <button class="settings-tab active" data-tab="appearance">
+              外观
+            </button>
+            <button class="settings-tab" data-tab="layout">布局</button>
+            <button class="settings-tab" data-tab="search">搜索引擎</button>
+            <div class="settings-sidebar-spacer"></div>
+            <button
+              id="btn-reset-settings"
+              class="settings-reset-btn"
+              title="重置所有设置"
+            >
+              重置设置
+            </button>
           </div>
-
-          <!-- Tab 2: 布局 -->
-          <div class="settings-tab-content" data-tab="layout">
-            <div class="setting-group">
-              <label class="setting-label">布局模式</label>
-              <div class="setting-options">
-                <button class="layout-option active" data-layout="rows">
-                  <svg viewBox="0 0 24 24" width="20" height="20">
-                    <rect
-                      x="2"
-                      y="2"
-                      width="20"
-                      height="5"
-                      rx="1"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                    />
-                    <rect
-                      x="2"
-                      y="9.5"
-                      width="20"
-                      height="5"
-                      rx="1"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                    />
-                    <rect
-                      x="2"
-                      y="17"
-                      width="20"
-                      height="5"
-                      rx="1"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                    />
-                  </svg>
-                  <span>分行</span>
-                </button>
-                <button class="layout-option" data-layout="grid">
-                  <svg viewBox="0 0 24 24" width="20" height="20">
-                    <rect
-                      x="2"
-                      y="2"
-                      width="9"
-                      height="9"
-                      rx="1"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                    />
-                    <rect
-                      x="13"
-                      y="2"
-                      width="9"
-                      height="9"
-                      rx="1"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                    />
-                    <rect
-                      x="2"
-                      y="13"
-                      width="9"
-                      height="9"
-                      rx="1"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                    />
-                    <rect
-                      x="13"
-                      y="13"
-                      width="9"
-                      height="9"
-                      rx="1"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                    />
-                  </svg>
-                  <span>卡片</span>
-                </button>
-                <button class="layout-option" data-layout="sidebar">
-                  <svg viewBox="0 0 24 24" width="20" height="20">
-                    <rect
-                      x="2"
-                      y="2"
-                      width="7"
-                      height="20"
-                      rx="1"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                    />
-                    <rect
-                      x="11"
-                      y="2"
-                      width="11"
-                      height="20"
-                      rx="1"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                    />
-                  </svg>
-                  <span>侧边栏</span>
-                </button>
+          <!-- 右侧内容区 -->
+          <div class="settings-content">
+            <!-- Tab 1: 外观 -->
+            <div class="settings-tab-content active" data-tab="appearance">
+              <!-- 主题深浅切换已移至悬浮工具栏 -->
+              <!-- 配色方案 -->
+              <div class="setting-group">
+                <label class="setting-label">配色方案</label>
+                <div class="color-options" id="color-options">
+                  <!-- JS 动态生成 -->
+                </div>
+              </div>
+              <!-- 背景图 -->
+              <div class="setting-group">
+                <label class="setting-label">背景图</label>
+                <div class="bg-options" id="bg-options">
+                  <!-- JS 动态生成 -->
+                </div>
+                <!-- URL 输入 -->
+                <div class="bg-url-row">
+                  <input
+                    type="url"
+                    id="bg-url-input"
+                    placeholder="输入图片网址..."
+                  />
+                  <button id="bg-url-apply">应用</button>
+                </div>
+                <!-- 上传按钮 -->
+                <div class="bg-upload-row">
+                  <button class="bg-upload-btn" id="bg-upload-btn">
+                    上传本地图片
+                  </button>
+                  <input
+                    type="file"
+                    id="bg-file-input"
+                    accept="image/*"
+                    style="display: none"
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Tab 3: 搜索引擎 -->
-          <div class="settings-tab-content" data-tab="search">
-            <div class="setting-group">
-              <label class="setting-label">默认搜索引擎</label>
-              <select id="setting-engine" class="setting-select"></select>
+            <!-- Tab 2: 布局 -->
+            <div class="settings-tab-content" data-tab="layout">
+              <div class="setting-group">
+                <label class="setting-label">布局模式</label>
+                <div class="setting-options">
+                  <button class="layout-option active" data-layout="rows">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                      <rect
+                        x="2"
+                        y="2"
+                        width="20"
+                        height="5"
+                        rx="1"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      />
+                      <rect
+                        x="2"
+                        y="9.5"
+                        width="20"
+                        height="5"
+                        rx="1"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      />
+                      <rect
+                        x="2"
+                        y="17"
+                        width="20"
+                        height="5"
+                        rx="1"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      />
+                    </svg>
+                    <span>分行</span>
+                  </button>
+                  <button class="layout-option" data-layout="grid">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                      <rect
+                        x="2"
+                        y="2"
+                        width="9"
+                        height="9"
+                        rx="1"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      />
+                      <rect
+                        x="13"
+                        y="2"
+                        width="9"
+                        height="9"
+                        rx="1"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      />
+                      <rect
+                        x="2"
+                        y="13"
+                        width="9"
+                        height="9"
+                        rx="1"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      />
+                      <rect
+                        x="13"
+                        y="13"
+                        width="9"
+                        height="9"
+                        rx="1"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      />
+                    </svg>
+                    <span>卡片</span>
+                  </button>
+                  <button class="layout-option" data-layout="sidebar">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                      <rect
+                        x="2"
+                        y="2"
+                        width="7"
+                        height="20"
+                        rx="1"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      />
+                      <rect
+                        x="11"
+                        y="2"
+                        width="11"
+                        height="20"
+                        rx="1"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                      />
+                    </svg>
+                    <span>侧边栏</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 3: 搜索引擎 -->
+            <div class="settings-tab-content" data-tab="search">
+              <div class="setting-group">
+                <label class="setting-label">默认搜索引擎</label>
+                <select id="setting-engine" class="setting-select"></select>
+              </div>
             </div>
           </div>
         </div>

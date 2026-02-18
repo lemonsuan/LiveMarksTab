@@ -91,6 +91,15 @@ function initSettings() {
     }
   });
 
+  // ---- 重置所有设置 ----
+  document.getElementById('btn-reset-settings').addEventListener('click', () => {
+    if (confirm('确定要重置所有设置吗？这将清除所有自定义配置并恢复默认值。')) {
+      chrome.storage.local.clear(() => {
+        location.reload();
+      });
+    }
+  });
+
   // ---- Tab 切换 ----
   document.querySelectorAll('.settings-tab').forEach(tab => {
     tab.addEventListener('click', () => {
