@@ -79,9 +79,9 @@ function extractFoldersAndLinks(tree) {
     });
   }
 
-  // 散落链接归入虚拟「未分类」文件夹，插入数组头部
+  // 散落链接归入虚拟「未分类」文件夹，放到末尾（置底）
   if (allLooseLinks.length > 0) {
-    allFolders.unshift({
+    allFolders.push({
       id: '__uncategorized__',  // 虚拟 ID，不对应真实书签节点
       title: '未分类',
       children: allLooseLinks,
