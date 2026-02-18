@@ -1,0 +1,1232 @@
+/*
+ * style.css — 全局样式表
+ *
+ * 架构概览:
+ *   1. CSS 变量 / 设计令牌 — 统一颜色、尺寸、过渡时间
+ *   2. 全局重置            — box-sizing, margin, padding
+ *   3. 入场动画            — fadeInUp, fadeIn, scaleIn
+ *   4. 搜索栏区域          — sticky 定位 + 引擎下拉
+ *   5. 书签内容区          — 三种布局的完整样式
+ *      A. 平铺卡片网格 (layout-grid)
+ *      B. 侧边栏 (layout-sidebar)
+ *      C. 行布局 (layout-rows) — 默认布局
+ *   6. 通用书签组件        — .bookmark-item, .nested-folder
+ *   7. 右键菜单            — .context-menu (fixed定位, z-index:600)
+ *   8. 编辑弹窗            — .edit-panel (复用 settings-overlay)
+ *   9. 设置面板            — .settings-overlay + .settings-panel
+ *  10. 工具类 / 滚动条 / 空状态 / Toast
+ *
+ * 主题修改:
+ *   修改颜色请编辑 :root 中的 CSS 变量，所有组件会自动继承
+ *   --accent: 主色调（按钮、高亮边框）
+ *   --bg-*:   背景色梯度
+ *   --text-*: 文字色梯度
+ */
+
+/* ============================================
+   1. CSS 变量 / 设计令牌
+   修改主题色只需修改这里的变量值
+   ============================================ */
+:root {
+  /* ---- 背景色阶（沉稳深蓝 · ui-ux-pro-max 推荐） ---- */
+  --bg-primary: #0F172A;              /* 页面最底层 — 深墨蓝 */
+  --bg-secondary: #1E293B;            /* 搜索框 / 设置面板 */
+  --bg-card: #1E293B;                 /* 卡片 / 菜单 / 弹窗 */
+  --bg-card-hover: #334155;           /* 悬停态 */
+  --bg-input: #1E293B;                /* 输入框 */
+  --bg-overlay: rgba(0, 0, 0, 0.55);  /* 弹窗遮罩 */
+
+  /* ---- 文字色阶 ---- */
+  --text-primary: #F8FAFC;            /* 标题、重要文字 */
+  --text-secondary: #94A3B8;          /* 正文、次要内容 */
+  --text-muted: #64748B;              /* 提示、占位符 */
+
+  /* ---- 主色调 (Indigo) ---- */
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
+  --accent-subtle: rgba(99, 102, 241, 0.12);
+
+  /* ---- 语义色 ---- */
+  --danger: #ef4444;
+  --danger-subtle: rgba(239, 68, 68, 0.12);
+  --success: #22c55e;
+
+  /* ---- 边框 ---- */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.10);
+
+  /* ---- 阴影 ---- */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.45);
+
+  /* ---- 尺寸 ---- */
+  --search-area-height: 140px;
+  --sidebar-width: 220px;
+  --card-radius: 10px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+
+  /* ---- 过渡时间 ---- */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+}
+
+/* ============================================
+   1b. 浅色主题变量覆盖
+   通过 <html data-theme="light"> 切换，只需修改颜色变量
+   ============================================ */
+[data-theme="light"] {
+  /* ---- 背景色阶 (Notion 风格 · 暖白) ---- */
+  --bg-primary: #FFFFFF;              /* 干净白底 */
+  --bg-secondary: #FFFFFF;            /* 面板/搜索用同色白 */
+  --bg-card: #FFFFFF;                 /* 卡片 */
+  --bg-card-hover: #F7F6F3;           /* 悬停 — Notion 标志性暖灰 */
+  --bg-input: #F7F6F3;                /* 输入框底色 */
+  --bg-overlay: rgba(15, 15, 15, 0.6); /* 遮罩 — Notion 用深灰 */
+
+  /* ---- 文字色阶 (Notion 标准) ---- */
+  --text-primary: #37352F;            /* 主文字 — Notion 正文色 */
+  --text-secondary: #787774;          /* 次要文字 */
+  --text-muted: #B4B4B0;              /* 提示/占位符 */
+
+  /* ---- 边框 (极淡) ---- */
+  --border: rgba(55, 53, 47, 0.09);   /* 几乎不可见 */
+  --border-hover: rgba(55, 53, 47, 0.16);
+
+  /* ---- 阴影 ---- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 3px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1), 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+/* ============================================
+   1c. 背景图生效时的毛玻璃效果
+   body.has-bg 时，卡片/面板/菜单加 backdrop-filter
+   ============================================ */
+body.has-bg .search-box,
+body.has-bg .bookmark-card,
+body.has-bg .sidebar-nav,
+body.has-bg .sidebar-content,
+body.has-bg .row-section,
+body.has-bg .context-menu,
+body.has-bg .settings-panel,
+body.has-bg .edit-panel,
+body.has-bg .toast,
+body.has-bg .engine-dropdown {
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+}
+
+/* 暗色 + 背景图：半透明暗色底 */
+[data-theme="dark"] body.has-bg .search-box,
+[data-theme="dark"] body.has-bg .bookmark-card,
+[data-theme="dark"] body.has-bg .sidebar-nav,
+[data-theme="dark"] body.has-bg .sidebar-content,
+[data-theme="dark"] body.has-bg .context-menu,
+[data-theme="dark"] body.has-bg .settings-panel,
+[data-theme="dark"] body.has-bg .toast,
+[data-theme="dark"] body.has-bg .engine-dropdown {
+  background: rgba(15, 15, 19, 0.72);
+}
+
+/* 浅色 + 背景图：半透明白底 */
+[data-theme="light"] body.has-bg .search-box,
+[data-theme="light"] body.has-bg .bookmark-card,
+[data-theme="light"] body.has-bg .sidebar-nav,
+[data-theme="light"] body.has-bg .sidebar-content,
+[data-theme="light"] body.has-bg .context-menu,
+[data-theme="light"] body.has-bg .settings-panel,
+[data-theme="light"] body.has-bg .toast,
+[data-theme="light"] body.has-bg .engine-dropdown {
+  background: rgba(255, 255, 255, 0.72);
+}
+
+/* row-section 行区块背景（有背景图时加玻璃底） */
+body.has-bg .row-section {
+  background: var(--bg-card);
+  border-radius: var(--card-radius);
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+}
+
+/* ============================================
+   1d. 设置面板 Tab 切换样式
+   ============================================ */
+.settings-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+}
+
+.settings-tab {
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.settings-tab:hover {
+  color: var(--text-primary);
+}
+
+.settings-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.settings-tab-content {
+  display: none;
+}
+
+.settings-tab-content.active {
+  display: block;
+}
+
+/* ---- 外观设置内的特殊组件 ---- */
+
+/* 主题模式切换按钮组 */
+.theme-options {
+  display: flex;
+  gap: 8px;
+}
+
+.theme-option {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.theme-option:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+.theme-option.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+/* 配色方案圆点选择器 */
+.color-options {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.color-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  position: relative;
+  transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.color-dot:hover {
+  transform: scale(1.15);
+}
+
+.color-dot.active {
+  border-color: var(--text-primary);
+}
+
+.color-dot.active::after {
+  content: '✓';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* 背景图选择区 */
+.bg-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.bg-option {
+  height: 56px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), transform var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.bg-option:hover {
+  transform: scale(1.04);
+  border-color: var(--border-hover);
+}
+
+.bg-option.active {
+  border-color: var(--accent);
+}
+
+.bg-option-none {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-card);
+}
+
+/* 背景图 URL 输入 */
+.bg-url-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.bg-url-row input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 12px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.bg-url-row input:focus {
+  border-color: var(--accent);
+}
+
+.bg-url-row button,
+.bg-upload-btn {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.bg-url-row button:hover,
+.bg-upload-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.bg-upload-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* ============================================
+   2. 全局重置
+   ============================================ */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ============================================
+   3. 入场动画
+   fadeInUp  — 卡片/行区块入场（从下方滑入+淡入）
+   fadeIn    — 搜索栏/设置按钮入场（纯淡入）
+   scaleIn   — 右键菜单/引擎下拉入场（缩放+淡入）
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ============================================
+   4. 搜索栏区域
+   sticky 定位，始终停留在页面顶部
+   ============================================ */
+#search-area {
+  height: var(--search-area-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(180deg, var(--bg-primary) 60%, transparent);
+  animation: fadeIn 0.4s ease;
+}
+
+.search-container {
+  width: 100%;
+  max-width: 640px;
+  position: relative;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 0 6px 0 20px;
+  height: 52px;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.search-box:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+
+#search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: var(--text-primary);
+  caret-color: var(--accent);
+}
+
+#search-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* 搜索引擎切换 */
+.engine-selector {
+  position: relative;
+}
+
+#engine-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+#engine-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+#engine-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+
+.arrow-icon {
+  opacity: 0.5;
+}
+
+.engine-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 160px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  list-style: none;
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  animation: scaleIn 0.15s ease;
+}
+
+.engine-dropdown li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.engine-dropdown li:hover {
+  background: var(--accent-subtle);
+  color: var(--text-primary);
+}
+
+.engine-dropdown li.active {
+  color: var(--accent);
+}
+
+.engine-dropdown li img {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+
+/* 搜索提示 */
+.search-hint {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  animation: fadeIn 0.2s ease;
+}
+
+/* ============================================
+   5. 书签内容区
+   三种布局容器，同一时间只有一个 .active
+   通过 settings.js 的 setLayout() 切换
+   ============================================ */
+#bookmark-area {
+  padding: 0 32px 32px;
+  min-height: calc(100vh - var(--search-area-height));
+}
+
+.bookmark-layout {
+  display: none;
+}
+
+.bookmark-layout.active {
+  display: block;
+}
+
+/* ---------- 布局 A: 平铺网格 ---------- */
+#layout-grid {
+  display: none;
+  gap: 20px;
+}
+
+#layout-grid.active {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  align-items: start;
+}
+
+/* 分类卡片 */
+.bookmark-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  transition:
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal),
+    transform var(--transition-normal);
+  animation: fadeInUp 0.3s ease both;
+}
+
+.bookmark-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
+}
+
+/* 卡片错开动画 */
+.bookmark-card:nth-child(1) { animation-delay: 0.02s; }
+.bookmark-card:nth-child(2) { animation-delay: 0.04s; }
+.bookmark-card:nth-child(3) { animation-delay: 0.06s; }
+.bookmark-card:nth-child(4) { animation-delay: 0.08s; }
+.bookmark-card:nth-child(5) { animation-delay: 0.10s; }
+.bookmark-card:nth-child(6) { animation-delay: 0.12s; }
+.bookmark-card:nth-child(n+7) { animation-delay: 0.14s; }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+}
+
+.card-header .folder-icon {
+  margin-right: 8px;
+  opacity: 0.6;
+}
+
+.card-body {
+  padding: 6px 8px;
+}
+
+/* 6. 通用书签链接项 — 三种布局共用 */
+.bookmark-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-xs);
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-fast);
+  overflow: hidden;
+}
+
+.bookmark-item:hover {
+  background: var(--accent-subtle);
+  color: var(--text-primary);
+  transform: translateX(2px);
+}
+
+.bookmark-item:active {
+  transform: scale(0.98);
+}
+
+.bookmark-item .favicon {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.bookmark-item:hover .favicon {
+  transform: scale(1.1);
+}
+
+.bookmark-item .title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 嵌套子文件夹 — 点击展开/折叠，三种布局共用 */
+.nested-folder {
+  margin: 4px 0;
+}
+
+.nested-folder-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+  user-select: none;
+}
+
+.nested-folder-header:hover {
+  background: var(--accent-subtle);
+  color: var(--text-primary);
+}
+
+.nested-folder-header .expand-icon {
+  width: 14px;
+  height: 14px;
+  transition: transform var(--transition-fast);
+  opacity: 0.5;
+}
+
+.nested-folder-header.expanded .expand-icon {
+  transform: rotate(90deg);
+}
+
+.nested-folder-body {
+  padding-left: 16px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.nested-folder-body.expanded {
+  max-height: 2000px;
+}
+
+/* ---------- 布局 B: 侧边栏 ---------- */
+#layout-sidebar {
+  gap: 0;
+}
+
+#layout-sidebar.active {
+  display: flex;
+  height: calc(100vh - var(--search-area-height) - 32px);
+}
+
+.sidebar-nav {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  border-radius: var(--card-radius) 0 0 var(--card-radius);
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+  user-select: none;
+}
+
+.sidebar-nav-item:hover {
+  background: var(--accent-subtle);
+  color: var(--text-primary);
+}
+
+.sidebar-nav-item.active {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.sidebar-nav-item .nav-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+}
+
+.sidebar-content {
+  flex: 1;
+  background: var(--bg-card);
+  border-radius: 0 var(--card-radius) var(--card-radius) 0;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.sidebar-content .bookmark-item {
+  display: inline-flex;
+  width: calc(50% - 8px);
+  margin: 4px;
+}
+
+@media (max-width: 900px) {
+  .sidebar-content .bookmark-item {
+    width: 100%;
+    margin: 2px 0;
+  }
+}
+
+/* ---------- 布局 C: 行布局 ---------- */
+#layout-rows.active {
+  display: block;
+}
+
+.row-section {
+  margin-bottom: 16px;
+  animation: fadeInUp 0.3s ease both;
+}
+
+.row-section:nth-child(1) { animation-delay: 0.02s; }
+.row-section:nth-child(2) { animation-delay: 0.04s; }
+.row-section:nth-child(3) { animation-delay: 0.06s; }
+.row-section:nth-child(4) { animation-delay: 0.08s; }
+.row-section:nth-child(5) { animation-delay: 0.10s; }
+.row-section:nth-child(n+6) { animation-delay: 0.12s; }
+
+.row-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+  margin-bottom: 4px;
+}
+
+.row-header .folder-icon {
+  opacity: 0.5;
+}
+
+.row-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.row-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+.row-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 4px;
+}
+
+/* 行布局中隐藏超出6行的项目 */
+.row-items .bookmark-item.row-hidden {
+  display: none;
+}
+
+/* 「更多」按钮 */
+.row-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  margin-top: 6px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.row-more-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+}
+
+.row-more-btn svg {
+  transition: transform var(--transition-fast);
+}
+
+.row-more-btn.expanded svg {
+  transform: rotate(180deg);
+}
+
+.row-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0 16px;
+}
+
+/* ============================================
+   7. 右键菜单
+   fixed 定位，由 bookmarks.js 的 showContextMenu() 控制显隐
+   z-index: 600（高于设置面板的 500）
+   ============================================ */
+.context-menu {
+  position: fixed;
+  z-index: 600;
+  min-width: 160px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  box-shadow: var(--shadow-lg);
+  animation: scaleIn 0.12s ease;
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.context-menu-item:hover {
+  background: var(--accent-subtle);
+  color: var(--text-primary);
+}
+
+.context-menu-item[data-action="delete"]:hover {
+  background: var(--danger-subtle);
+  color: var(--danger);
+}
+
+.context-menu-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+/* ============================================
+   8. 编辑弹窗
+   复用 settings-overlay 遮罩 + settings-panel 面板的样式
+   .edit-panel 限定宽度为 420px
+   ============================================ */
+.edit-panel {
+  width: 420px;
+}
+
+.setting-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.setting-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 8px 20px;
+  border: none;
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+/* ============================================
+   9a. 设置悬浮按钮（右下角固定定位）
+   hover 时旋转 45° 齿轮图标
+   ============================================ */
+.settings-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    transform var(--transition-normal);
+  z-index: 90;
+  animation: fadeIn 0.5s ease 0.3s both;
+}
+
+.settings-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  transform: rotate(45deg);
+}
+
+/* ============================================
+   9b. 设置浮层
+   .settings-overlay: 全屏遮罩（opacity 过渡 + pointer-events 切换）
+   .settings-panel: 居中面板（translateY+scale 入场动画）
+   通过 .visible 类控制显隐
+   ============================================ */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
+}
+
+.settings-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.settings-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  width: 440px;
+  max-width: 90vw;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(20px) scale(0.98);
+  transition: transform var(--transition-normal);
+}
+
+.settings-overlay.visible .settings-panel {
+  transform: translateY(0) scale(1);
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.settings-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.settings-close:hover {
+  color: var(--text-primary);
+  transform: rotate(90deg);
+}
+
+.settings-body {
+  padding: 20px;
+}
+
+.setting-group {
+  margin-bottom: 20px;
+}
+
+.setting-group:last-child {
+  margin-bottom: 0;
+}
+
+.setting-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.setting-options {
+  display: flex;
+  gap: 10px;
+}
+
+.layout-option {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.layout-option:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.layout-option.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.setting-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.setting-select:focus {
+  border-color: var(--accent);
+}
+
+/* ============================================
+   10. 工具类 / 滚动条 / 空状态 / Toast
+   ============================================ */
+.hidden {
+  display: none !important;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-hover);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ============================================
+   空状态
+   ============================================ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.empty-state svg {
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+/* ============================================
+   Toast 通知
+   ============================================ */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  padding: 10px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-primary);
+  font-size: 13px;
+  box-shadow: var(--shadow-lg);
+  z-index: 700;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
