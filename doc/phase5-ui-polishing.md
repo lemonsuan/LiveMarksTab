@@ -39,3 +39,8 @@
 - 大量使用 CSS Variables 实现主题统一度。
 - 利用 `backdrop-filter` 实现高性能的模糊效果。
 - 关键动画使用 `transform` / `opacity` 确保 60fps 流畅度。
+
+## 4. 响应式布局调整 (User Feedback)
+- **留白优化**:  `#layout-grid` 和 `#layout-rows` 宽度限制为 **82%** (Max 1600px) 并居中，避免在大屏上过于拥挤。
+- **移动端适配**: 小屏幕 (<768px) 自动放宽至 94%。
+- **文件夹样式**: 默认启用圆角卡片风格 (`border-radius` + `background` + `border`)，统一视觉体验。
