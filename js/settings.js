@@ -259,6 +259,9 @@ function loadSettings() {
       // 搜索引擎
       document.getElementById('setting-engine').value = engineId;
 
+      // 多引擎勾选列表
+      renderMultiEngineList();
+
       // (主题切换由悬浮栏控制，无需更新设置面板 UI)
 
       // 配色
@@ -298,4 +301,39 @@ function setLayout(layout) {
   const targetEl = layout === 'sidebar' ? sidebarEl : layout === 'grid' ? gridEl : rowsEl;
   targetEl.classList.remove('hidden');
   targetEl.classList.add('active');
+}
+
+/**
+ * 渲染多引擎搜索勾选列表
+ */
+function renderMultiEngineList() {
+  const container = document.getElementById('multi-engine-list');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const selectedIds = getMultiEngineIds();
+
+  SEARCH_ENGINES.forEach(engine => {
+    const label = createElement('label', { className: 'multi-engine-item' });
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = selectedIds.includes(engine.id);
+    checkbox.addEventListener('change', () => {
+      toggleMultiEngine(engine.id, checkbox.checked);
+    });
+
+    const icon = createElement('img', {
+      src: engine.icon,
+      alt: engine.name,
+      className: 'multi-engine-icon',
+    });
+
+    const name = document.createTextNode(engine.name);
+
+    label.appendChild(checkbox);
+    label.appendChild(icon);
+    label.appendChild(name);
+    container.appendChild(label);
+  });
 }

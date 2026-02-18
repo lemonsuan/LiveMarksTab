@@ -12,6 +12,8 @@ const SEARCH_ENGINES = [
 ];
 
 let currentEngineId = 'google';
+// 多引擎搜索：用户勾选的引擎 ID 列表，默认全选
+let multiEngineIds = SEARCH_ENGINES.map(e => e.id);
 
 /**
  * 初始化搜索栏
@@ -22,8 +24,11 @@ function initSearch() {
   const engineList = document.getElementById('engine-list');
 
   // 加载保存的搜索引擎偏好
-  chrome.storage.local.get('searchEngine', (data) => {
+  chrome.storage.local.get(['searchEngine', 'multiEngines'], (data) => {
     currentEngineId = data.searchEngine || 'google';
+    if (data.multiEngines && Array.isArray(data.multiEngines)) {
+      multiEngineIds = data.multiEngines;
+    }
     updateEngineUI();
   });
 
@@ -51,11 +56,25 @@ function initSearch() {
     }
   }, 250));
 
-  // 回车 → 跳转搜索引擎
+  // 回车 → 跳转搜索引擎；Shift+Enter → 多引擎同时搜索
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const query = input.value.trim();
-      if (query) {
+      if (!query) return;
+
+      if (e.shiftKey) {
+        // Shift+Enter: 同时打开所有勾选的搜索引擎
+        e.preventDefault();
+        const engines = SEARCH_ENGINES.filter(en => multiEngineIds.includes(en.id));
+        if (engines.length === 0) {
+          showToast('请先在设置中勾选至少一个搜索引擎');
+          return;
+        }
+        engines.forEach(engine => {
+          chrome.tabs.create({ url: engine.url + encodeURIComponent(query) });
+        });
+      } else {
+        // Enter: 单引擎搜索
         const engine = SEARCH_ENGINES.find(en => en.id === currentEngineId) || SEARCH_ENGINES[0];
         window.location.href = engine.url + encodeURIComponent(query);
       }
@@ -129,7 +148,7 @@ function filterBookmarks(query) {
 
   // 搜索提示
   const hint = document.getElementById('search-hint');
-  hint.textContent = `找到 ${matchCount} 个匹配的书签，按 Enter 使用 ${(SEARCH_ENGINES.find(e => e.id === currentEngineId) || SEARCH_ENGINES[0]).name} 搜索`;
+  hint.textContent = `找到 ${matchCount} 个匹配的书签，Enter 搜索 / Shift+Enter 多引擎搜索`;
   hint.classList.remove('hidden');
 }
 
@@ -144,4 +163,27 @@ function clearFilter() {
     card.style.display = '';
   });
   document.getElementById('search-hint').classList.add('hidden');
+}
+
+/**
+ * 切换多引擎搜索的引擎勾选状态
+ * @param {string} engineId
+ * @param {boolean} checked
+ */
+function toggleMultiEngine(engineId, checked) {
+  if (checked) {
+    if (!multiEngineIds.includes(engineId)) {
+      multiEngineIds.push(engineId);
+    }
+  } else {
+    multiEngineIds = multiEngineIds.filter(id => id !== engineId);
+  }
+  chrome.storage.local.set({ multiEngines: multiEngineIds });
+}
+
+/**
+ * 获取当前多引擎勾选列表（供 settings.js 使用）
+ */
+function getMultiEngineIds() {
+  return multiEngineIds;
 }

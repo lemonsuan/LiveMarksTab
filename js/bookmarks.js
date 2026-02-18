@@ -142,12 +142,23 @@ function createBookmarkCard(folder) {
 }
 
 function renderFolderContent(container, items) {
+  const links = [];
+  const subFolders = [];
   items.forEach(item => {
-    if (item.url) {
-      container.appendChild(createBookmarkLink(item));
-    } else if (item.children) {
-      container.appendChild(createNestedFolder(item));
-    }
+    if (item.url) links.push(item);
+    else if (item.children) subFolders.push(item);
+  });
+
+  // 书签用网格卡片排列
+  if (links.length > 0) {
+    const grid = createElement('div', { className: 'row-items' });
+    links.forEach(item => grid.appendChild(createBookmarkLink(item)));
+    container.appendChild(grid);
+  }
+
+  // 子文件夹递归渲染
+  subFolders.forEach(sub => {
+    container.appendChild(createNestedFolder(sub));
   });
 }
 
