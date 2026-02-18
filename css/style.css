@@ -896,9 +896,14 @@ body {
 }
 
 .row-items {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 4px;
+}
+
+.row-items > .bookmark-item,
+.row-items > .folder-card {
+  width: 180px;
 }
 
 /* 行布局中隐藏超出6行的项目 */
