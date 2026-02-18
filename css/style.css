@@ -659,6 +659,80 @@ body {
   white-space: nowrap;
 }
 
+/* 文件夹卡片 — 网格内显示 */
+.folder-card {
+  cursor: pointer;
+  border: 1px dashed var(--border);
+  background: var(--bg-card);
+  position: relative;
+}
+
+.folder-card:hover {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.folder-card.folder-expanded {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+  box-shadow: 0 0 0 2px var(--accent-subtle);
+}
+
+.folder-card .folder-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.folder-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  min-width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  border-radius: 8px;
+  padding: 0 4px;
+}
+
+/* 文件夹展开面板 */
+.folder-expand-panel {
+  margin: 8px 0;
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+}
+
+.folder-expand-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.folder-expand-header .folder-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+}
+
+.folder-expand-body {
+  /* 内容自然流式显示 */
+}
+
 /* 嵌套子文件夹 — 点击展开/折叠，三种布局共用 */
 .nested-folder {
   margin: 4px 0;

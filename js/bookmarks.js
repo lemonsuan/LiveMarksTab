@@ -149,17 +149,17 @@ function renderFolderContent(container, items) {
     else if (item.children) subFolders.push(item);
   });
 
-  // 书签用网格卡片排列
-  if (links.length > 0) {
+  // 书签和子文件夹统一放入网格
+  if (links.length > 0 || subFolders.length > 0) {
     const grid = createElement('div', { className: 'row-items' });
+    // 先放子文件夹卡片
+    subFolders.forEach(sub => {
+      grid.appendChild(createFolderCard(sub, container));
+    });
+    // 再放书签链接
     links.forEach(item => grid.appendChild(createBookmarkLink(item)));
     container.appendChild(grid);
   }
-
-  // 子文件夹递归渲染
-  subFolders.forEach(sub => {
-    container.appendChild(createNestedFolder(sub));
-  });
 }
 
 // ============================================
@@ -269,6 +269,12 @@ function createRowSection(folder) {
   const maxVisible = ROWS_MAX_VISIBLE * 6;
   const hasMore = totalCount > maxVisible;
 
+  // 子文件夹也放入网格（作为文件夹卡片）
+  subFolders.forEach(sub => {
+    grid.appendChild(createFolderCard(sub, section));
+  });
+
+  // 链接网格
   directLinks.forEach((item, index) => {
     const link = createBookmarkLink(item);
     if (index >= maxVisible) {
@@ -277,14 +283,6 @@ function createRowSection(folder) {
     grid.appendChild(link);
   });
   section.appendChild(grid);
-
-  // 启用书签项拖拽排序
-  enableBookmarkDrag(grid, folder.id);
-
-  // 子文件夹也渲染为嵌套
-  subFolders.forEach(sub => {
-    section.appendChild(createNestedFolder(sub));
-  });
 
   // 「更多」按钮
   if (hasMore) {
@@ -361,6 +359,78 @@ function createBookmarkLink(item) {
   });
 
   return a;
+}
+
+/**
+ * 创建文件夹卡片（网格内显示）
+ * 点击后在父容器下方展开文件夹内容
+ */
+function createFolderCard(folder, parentContainer) {
+  const card = createElement('div', {
+    className: 'bookmark-item folder-card',
+    dataset: { id: folder.id },
+  });
+
+  // 文件夹图标
+  card.appendChild(createFolderIcon());
+
+  // 标题
+  const title = createElement('span', { className: 'title' }, folder.title || '未命名');
+  card.appendChild(title);
+
+  // 子项数量角标
+  const count = (folder.children || []).length;
+  if (count > 0) {
+    const badge = createElement('span', { className: 'folder-badge' }, String(count));
+    card.appendChild(badge);
+  }
+
+  // 点击展开/收起
+  card.addEventListener('click', (e) => {
+    e.preventDefault();
+    // 查找已存在的展开面板
+    const existingPanel = parentContainer.querySelector(`.folder-expand-panel[data-folder-id="${folder.id}"]`);
+    if (existingPanel) {
+      // 收起
+      card.classList.remove('folder-expanded');
+      existingPanel.remove();
+    } else {
+      // 展开
+      card.classList.add('folder-expanded');
+      const panel = createElement('div', {
+        className: 'folder-expand-panel',
+        dataset: { folderId: folder.id },
+      });
+      // 面板头部
+      const panelHeader = createElement('div', { className: 'folder-expand-header' });
+      panelHeader.appendChild(createFolderIcon());
+      panelHeader.appendChild(createElement('span', {}, folder.title || '未命名'));
+      panel.appendChild(panelHeader);
+      // 面板内容
+      const panelBody = createElement('div', { className: 'folder-expand-body' });
+      renderFolderContent(panelBody, folder.children || []);
+      panel.appendChild(panelBody);
+      // 插入到网格后面
+      const grid = card.closest('.row-items');
+      if (grid && grid.nextSibling) {
+        parentContainer.insertBefore(panel, grid.nextSibling);
+      } else {
+        parentContainer.appendChild(panel);
+      }
+    }
+  });
+
+  // 右键菜单（文件夹）
+  card.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    showContextMenu(e.clientX, e.clientY, {
+      type: 'folder',
+      id: folder.id,
+      title: folder.title,
+    });
+  });
+
+  return card;
 }
 
 function createNestedFolder(folder) {
