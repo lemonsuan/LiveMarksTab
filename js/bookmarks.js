@@ -596,9 +596,33 @@ function showQRCodePanel(url, title) {
   const canvas = document.getElementById('qr-canvas');
   const urlEl = document.getElementById('qr-url');
 
-  // 生成二维码
+  // 使用 qrcode-generator 库生成二维码
   try {
-    generateQRCode(canvas, url, 200);
+    const qr = qrcode(0, 'M'); // typeNumber=0 自动, ECC=M
+    qr.addData(url);
+    qr.make();
+
+    const moduleCount = qr.getModuleCount();
+    const pixelSize = 200;
+    const cellSize = pixelSize / (moduleCount + 8); // 留 4 格白边
+    canvas.width = pixelSize;
+    canvas.height = pixelSize;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, pixelSize, pixelSize);
+    ctx.fillStyle = '#000000';
+    for (let r = 0; r < moduleCount; r++) {
+      for (let c = 0; c < moduleCount; c++) {
+        if (qr.isDark(r, c)) {
+          ctx.fillRect(
+            Math.floor((c + 4) * cellSize),
+            Math.floor((r + 4) * cellSize),
+            Math.ceil(cellSize),
+            Math.ceil(cellSize)
+          );
+        }
+      }
+    }
   } catch (err) {
     showToast('二维码生成失败: ' + err.message);
     return;
