@@ -175,16 +175,22 @@ async function startScan() {
 
       const row = document.createElement('label');
       row.className = 'cleaner-item';
+      row.title = '双击在新标签页打开';
       row.innerHTML = `
         <input type="checkbox" checked data-id="${item.id}">
         <img src="${getFaviconUrl(item.url)}" width="16" height="16" alt="">
-        <span class="cleaner-item-title" title="${item.title}">${item.title}</span>
+        <span class="cleaner-item-title" title="${item.url}">${item.title}</span>
         <span class="cleaner-item-status ${item.status}">${
           item.status === 'error'
             ? (item.code ? `HTTP ${item.code}` : '无法连接')
             : '超时'
         }</span>
       `;
+      // 双击在新标签页打开（阻止 label 默认行为避免触发 checkbox）
+      row.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        chrome.tabs.create({ url: item.url });
+      });
       resultsList.appendChild(row);
     }
   });
