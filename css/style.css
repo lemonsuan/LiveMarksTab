@@ -438,8 +438,17 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: linear-gradient(180deg, var(--bg-primary) 60%, transparent);
+  /* Apple-style Glassmorphism */
+  background: rgba(249, 250, 251, 0.75); /* Translucent Gray-50 */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   animation: fadeIn 0.4s ease;
+}
+
+[data-theme="dark"] #search-area {
+  background: rgba(28, 28, 28, 0.75); /* Translucent Dark */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .search-container {
