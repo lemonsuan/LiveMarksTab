@@ -237,20 +237,90 @@
 }
 
 /* ============================================
-   背景图兼容
+   背景图兼容 — 动态对比度处理
    ============================================ */
-body.has-bg .search-box,
+
+/* 问候语 + 一言：白色文字 + 投影 */
+body.has-bg .greeting {
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+body.has-bg .hitokoto a {
+  color: rgba(255, 255, 255, 0.75);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+body.has-bg .hitokoto a:hover {
+  color: #ffffff;
+}
+
+/* 搜索框：半透明毛玻璃 + 白色文字 */
+body.has-bg .search-box {
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+body.has-bg #search-input {
+  color: #ffffff;
+}
+
+body.has-bg #search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+body.has-bg #engine-btn {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+body.has-bg #engine-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+body.has-bg .arrow-icon {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* 搜索提示 */
+body.has-bg .search-hint {
+  color: rgba(255, 255, 255, 0.7);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 引擎下拉列表 */
 body.has-bg .engine-dropdown {
-  backdrop-filter: blur(16px) saturate(1.6);
-  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  background: rgba(30, 30, 30, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
-[data-theme="dark"] body.has-bg .search-box,
-[data-theme="dark"] body.has-bg .engine-dropdown {
-  background: rgba(26, 27, 30, 0.75);
+body.has-bg .engine-dropdown li {
+  color: rgba(255, 255, 255, 0.8);
 }
 
-[data-theme="light"] body.has-bg .search-box,
-[data-theme="light"] body.has-bg .engine-dropdown {
-  background: rgba(255, 255, 255, 0.75);
+body.has-bg .engine-dropdown li:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* 快速访问：白色文字 + 图标毛玻璃 */
+body.has-bg .site-name {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+body.has-bg .site-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.has-bg .site-icon {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
