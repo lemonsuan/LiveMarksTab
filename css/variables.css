@@ -19,11 +19,11 @@
     "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
 
   /* ---- 调色板 ---- */
-  --bg-primary: #f8f9fa;
+  --bg-primary: #fbfbfa;
   --bg-secondary: #ffffff;
   --bg-card: #ffffff;
-  --bg-card-hover: #f1f3f5;
-  --bg-input: #f1f3f5;
+  --bg-card-hover: #f7f6f3;
+  --bg-input: #f1f1ef;
   --bg-overlay: rgba(0, 0, 0, 0.25);
 
   /* 边框 */
