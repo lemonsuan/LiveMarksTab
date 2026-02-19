@@ -1,3 +1,6 @@
 .ace-tool/
 .agent/
 pic/.DS_Store
+*.zip
+convert_pics.py
+LiveMarksTab_1.0.1.zip
