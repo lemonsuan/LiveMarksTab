@@ -173,14 +173,22 @@ let _sidebarPath = []; // 面包屑路径栈 [{id, title, children}]
 
 function renderSidebarLayout(folders) {
   _sidebarFolders = folders;
-  // 初始化：显示根级（所有一级文件夹和链接）
+  // 初始化：显示根级
+  // 面包屑布局下，未分类书签直接散落在根级，不包裹为虚拟文件夹
+  const rootChildren = [];
+  folders.forEach(f => {
+    if (f.id === '__uncategorized__') {
+      // 散落：把未分类的子项直接铺开到根
+      (f.children || []).forEach(child => rootChildren.push(child));
+    } else {
+      rootChildren.push(f);
+    }
+  });
+
   _sidebarPath = [{
     id: '__root__',
     title: '全部书签',
-    children: folders.flatMap(f => {
-      // 把一级文件夹本身作为子项展示
-      return [f];
-    }),
+    children: rootChildren,
   }];
   renderSidebarView();
 }
