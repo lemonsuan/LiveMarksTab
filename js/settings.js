@@ -68,6 +68,20 @@ function initSettings() {
     toggleTheme();
   });
 
+  // Chrome 快捷入口按钮
+  document.getElementById("btn-passwords").addEventListener("click", () => {
+    chrome.tabs.create({ url: "chrome://password-manager/passwords" });
+  });
+  document.getElementById("btn-history").addEventListener("click", () => {
+    chrome.tabs.create({ url: "chrome://history" });
+  });
+  document.getElementById("btn-extensions").addEventListener("click", () => {
+    chrome.tabs.create({ url: "chrome://extensions" });
+  });
+  document.getElementById("btn-cleaner").addEventListener("click", () => {
+    openCleanerPanel();
+  });
+
   // 关闭设置
   const closeSettings = () => {
     overlay.classList.remove("visible");
