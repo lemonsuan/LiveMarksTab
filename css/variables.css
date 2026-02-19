@@ -1,0 +1,97 @@
+/*
+ * variables.css — 设计令牌 (Design Tokens)
+ *
+ * 统一管理所有颜色、间距、圆角、阴影、动效变量。
+ * 修改此文件即可全局变更项目视觉风格。
+ *
+ * 简化原则：
+ *   圆角 3 档 (sm/md/full)
+ *   阴影 2 档 (sm/lg)
+ *   动效 2 种 (fadeInUp/scaleIn)
+ */
+
+/* ============================================
+   浅色主题 (默认)
+   ============================================ */
+:root {
+  /* ---- 字体系统 ---- */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+
+  /* ---- 调色板 ---- */
+  --bg-primary: #fbfbfa;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f7f6f3;
+  --bg-input: #f1f1ef;
+  --bg-overlay: rgba(0, 0, 0, 0.25);
+
+  /* 边框 */
+  --border: #e9ecef;
+  --border-hover: #ced4da;
+  --border-highlight: #74c0fc;
+
+  /* 文字 */
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --text-muted: #adb5bd;
+
+  /* 主色调 */
+  --accent: #339af0;
+  --accent-hover: #228be6;
+  --accent-subtle: rgba(51, 154, 240, 0.1);
+  --accent-glow: rgba(51, 154, 240, 0.3);
+
+  /* 功能色 */
+  --danger: #fa5252;
+  --danger-subtle: rgba(250, 82, 82, 0.1);
+  --success: #51cf66;
+  --warning: #fcc419;
+
+  /* ---- 阴影 (2 档) ---- */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.12),
+    0 4px 10px -2px rgba(0, 0, 0, 0.06);
+
+  /* ---- 圆角 (3 档) ---- */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-full: 999px;
+
+  /* ---- 尺寸 ---- */
+  --sidebar-width: 240px;
+  --content-max-width: 1200px;
+
+  /* ---- 动效 ---- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-fast: 0.15s var(--ease-out);
+  --transition-normal: 0.3s var(--ease-out);
+}
+
+/* ============================================
+   深色主题
+   ============================================ */
+[data-theme="dark"] {
+  --bg-primary: #1a1b1e;
+  --bg-secondary: #25262b;
+  --bg-card: #2c2e33;
+  --bg-card-hover: #373a40;
+  --bg-input: #373a40;
+  --bg-overlay: rgba(0, 0, 0, 0.55);
+
+  --border: #373a40;
+  --border-hover: #495057;
+  --border-highlight: #4dabf7;
+
+  --text-primary: #f1f3f5;
+  --text-secondary: #dee2e6;
+  --text-muted: #adb5bd;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================
+   配色方案 — 通过 JS 切换 --accent 系列变量
+   预设 5 套供 theme.js 使用，无需额外 CSS
+   ============================================ */

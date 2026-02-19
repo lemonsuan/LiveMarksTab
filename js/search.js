@@ -1,19 +1,22 @@
 /**
- * search.js — 搜索栏功能：引擎切换 + 书签过滤 + 跳转搜索
+ * search.js — 搜索栏功能：引擎切换 + 书签过滤 + 跳转搜索 + 自定义引擎
  */
 
-// 搜索引擎预设列表
-const SEARCH_ENGINES = [
+// 内置搜索引擎
+const BUILTIN_ENGINES = [
+  { id: 'baidu',     name: '百度',       url: 'https://www.baidu.com/s?wd=',            icon: 'https://www.baidu.com/favicon.ico' },
   { id: 'google',    name: 'Google',     url: 'https://www.google.com/search?q=',       icon: 'https://www.google.com/favicon.ico' },
   { id: 'bing',      name: 'Bing',       url: 'https://www.bing.com/search?q=',         icon: 'https://www.bing.com/favicon.ico' },
-  { id: 'baidu',     name: '百度',       url: 'https://www.baidu.com/s?wd=',            icon: 'https://www.baidu.com/favicon.ico' },
   { id: 'duckduckgo', name: 'DuckDuckGo', url: 'https://duckduckgo.com/?q=',            icon: 'https://duckduckgo.com/favicon.ico' },
   { id: 'github',    name: 'GitHub',     url: 'https://github.com/search?q=',           icon: 'https://github.com/favicon.ico' },
 ];
 
-let currentEngineId = 'google';
-// 多引擎搜索：用户勾选的引擎 ID 列表，默认全选
-let multiEngineIds = SEARCH_ENGINES.map(e => e.id);
+// 完整引擎列表 = 内置 + 用户自定义
+let SEARCH_ENGINES = [...BUILTIN_ENGINES];
+
+let currentEngineId = 'baidu';
+// 多引擎搜索：默认不勾选 github
+let multiEngineIds = BUILTIN_ENGINES.filter(e => e.id !== 'github').map(e => e.id);
 
 /**
  * 初始化搜索栏
@@ -23,13 +26,19 @@ function initSearch() {
   const engineBtn = document.getElementById('engine-btn');
   const engineList = document.getElementById('engine-list');
 
-  // 加载保存的搜索引擎偏好
-  chrome.storage.local.get(['searchEngine', 'multiEngines'], (data) => {
-    currentEngineId = data.searchEngine || 'google';
+  // 加载保存的搜索引擎偏好和自定义引擎
+  chrome.storage.local.get(['searchEngine', 'multiEngines', 'customEngines'], (data) => {
+    // 加载自定义引擎
+    if (data.customEngines && Array.isArray(data.customEngines)) {
+      SEARCH_ENGINES = [...BUILTIN_ENGINES, ...data.customEngines];
+    }
+
+    currentEngineId = data.searchEngine || 'baidu';
     if (data.multiEngines && Array.isArray(data.multiEngines)) {
       multiEngineIds = data.multiEngines;
     }
     updateEngineUI();
+    renderEngineList();
   });
 
   // 渲染引擎下拉列表
@@ -125,7 +134,6 @@ function updateEngineUI() {
 
 /**
  * 过滤书签（输入时实时搜索）
- * 在两种布局下都生效
  */
 function filterBookmarks(query) {
   const lowerQuery = query.toLowerCase();
@@ -167,8 +175,6 @@ function clearFilter() {
 
 /**
  * 切换多引擎搜索的引擎勾选状态
- * @param {string} engineId
- * @param {boolean} checked
  */
 function toggleMultiEngine(engineId, checked) {
   if (checked) {
@@ -182,8 +188,56 @@ function toggleMultiEngine(engineId, checked) {
 }
 
 /**
- * 获取当前多引擎勾选列表（供 settings.js 使用）
+ * 获取当前多引擎勾选列表
  */
 function getMultiEngineIds() {
   return multiEngineIds;
+}
+
+/**
+ * 添加自定义搜索引擎
+ * @param {string} name - 引擎名称
+ * @param {string} url - 搜索 URL（用 %s 或直接追加）
+ */
+function addCustomEngine(name, url) {
+  const id = 'custom_' + Date.now();
+  // 提取 favicon
+  let iconUrl;
+  try {
+    const u = new URL(url);
+    iconUrl = u.origin + '/favicon.ico';
+  } catch {
+    iconUrl = '';
+  }
+
+  // 确保 URL 格式正确：如果包含 %s，替换为查询参数模式
+  let searchUrl = url;
+  if (url.includes('%s')) {
+    searchUrl = url.replace('%s', '');
+  }
+
+  const engine = { id, name, url: searchUrl, icon: iconUrl, custom: true };
+  SEARCH_ENGINES.push(engine);
+
+  // 持久化自定义引擎
+  const customEngines = SEARCH_ENGINES.filter(e => e.custom);
+  chrome.storage.local.set({ customEngines });
+
+  return engine;
+}
+
+/**
+ * 删除自定义搜索引擎
+ */
+function removeCustomEngine(engineId) {
+  SEARCH_ENGINES = SEARCH_ENGINES.filter(e => e.id !== engineId);
+  multiEngineIds = multiEngineIds.filter(id => id !== engineId);
+  if (currentEngineId === engineId) {
+    currentEngineId = 'baidu';
+    chrome.storage.local.set({ searchEngine: 'baidu' });
+    updateEngineUI();
+  }
+
+  const customEngines = SEARCH_ENGINES.filter(e => e.custom);
+  chrome.storage.local.set({ customEngines, multiEngines: multiEngineIds });
 }

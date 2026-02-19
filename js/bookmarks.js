@@ -163,57 +163,133 @@ function renderFolderContent(container, items) {
 }
 
 // ============================================
-// 布局 B: 侧边栏
-// 左侧导航栏 (sidebar-nav) + 右侧内容区 (sidebar-content)
-// 点击导航项切换右侧显示的文件夹内容
+// 布局 B: 面包屑 + 平铺导航
+// 点击文件夹 → 钻入，面包屑更新
+// 当前文件夹内容用网格平铺
 // ============================================
 
-let activeSidebarFolderId = null;
 let _sidebarFolders = [];
+let _sidebarPath = []; // 面包屑路径栈 [{id, title, children}]
 
 function renderSidebarLayout(folders) {
-  const nav = document.getElementById('sidebar-nav');
-  const content = document.getElementById('sidebar-content');
-  nav.innerHTML = '';
-  content.innerHTML = '';
   _sidebarFolders = folders;
-
-  if (folders.length === 0) return;
-
-  folders.forEach((folder, index) => {
-    const navItem = createElement('div', {
-      className: 'sidebar-nav-item' + (index === 0 ? ' active' : ''),
-      dataset: { id: folder.id },
-      onClick: () => selectSidebarFolder(folder.id),
-    }, [createFolderIcon(), document.createTextNode(folder.title || '未命名')]);
-    nav.appendChild(navItem);
-  });
-
-  activeSidebarFolderId = folders[0].id;
-  renderSidebarContent(content, folders[0].children || []);
-}
-
-function selectSidebarFolder(folderId) {
-  activeSidebarFolderId = folderId;
-  document.querySelectorAll('.sidebar-nav-item').forEach(item => {
-    item.classList.toggle('active', item.dataset.id === folderId);
-  });
-  const folder = _sidebarFolders.find(f => f.id === folderId);
-  const content = document.getElementById('sidebar-content');
-  content.innerHTML = '';
-  if (folder) {
-    renderSidebarContent(content, folder.children || []);
-  }
-}
-
-function renderSidebarContent(container, items) {
-  items.forEach(item => {
-    if (item.url) {
-      container.appendChild(createBookmarkLink(item));
-    } else if (item.children) {
-      container.appendChild(createNestedFolder(item));
+  // 初始化：显示根级
+  // 面包屑布局下，未分类书签直接散落在根级，不包裹为虚拟文件夹
+  const rootChildren = [];
+  folders.forEach(f => {
+    if (f.id === '__uncategorized__') {
+      // 散落：把未分类的子项直接铺开到根
+      (f.children || []).forEach(child => rootChildren.push(child));
+    } else {
+      rootChildren.push(f);
     }
   });
+
+  _sidebarPath = [{
+    id: '__root__',
+    title: '全部书签',
+    children: rootChildren,
+  }];
+  renderSidebarView();
+}
+
+/**
+ * 渲染当前面包屑路径对应的视图
+ */
+function renderSidebarView() {
+  const breadcrumb = document.getElementById('sidebar-breadcrumb');
+  const grid = document.getElementById('sidebar-grid');
+  if (!breadcrumb || !grid) return;
+
+  const currentLevel = _sidebarPath[_sidebarPath.length - 1];
+  const items = currentLevel.children || [];
+
+  // 渲染面包屑
+  breadcrumb.innerHTML = '';
+  _sidebarPath.forEach((level, index) => {
+    const isLast = index === _sidebarPath.length - 1;
+
+    const crumb = createElement('span', {
+      className: 'breadcrumb-item' + (isLast ? ' current' : ''),
+    }, level.title || '未命名');
+
+    if (!isLast) {
+      crumb.addEventListener('click', () => {
+        // 点击面包屑：回退到该层级
+        _sidebarPath = _sidebarPath.slice(0, index + 1);
+        renderSidebarView();
+      });
+    }
+
+    breadcrumb.appendChild(crumb);
+
+    if (!isLast) {
+      breadcrumb.appendChild(
+        createElement('span', { className: 'breadcrumb-sep' }, '›')
+      );
+    }
+  });
+
+  // 渲染网格内容
+  grid.innerHTML = '';
+  grid.style.animation = 'none';
+  requestAnimationFrame(() => { grid.style.animation = ''; });
+
+  const subFolders = [];
+  const links = [];
+  items.forEach(item => {
+    if (item.children) subFolders.push(item);
+    else if (item.url) links.push(item);
+  });
+
+  // 先放文件夹
+  subFolders.forEach(folder => {
+    const card = createElement('div', {
+      className: 'sidebar-folder-card',
+      dataset: { id: folder.id },
+    });
+
+    card.appendChild(createFolderIcon());
+    card.appendChild(createElement('span', {}, folder.title || '未命名'));
+
+    const count = (folder.children || []).length;
+    if (count > 0) {
+      card.appendChild(
+        createElement('span', { className: 'folder-count' }, String(count))
+      );
+    }
+
+    card.addEventListener('click', () => {
+      // 钻入子文件夹
+      _sidebarPath.push({
+        id: folder.id,
+        title: folder.title,
+        children: folder.children || [],
+      });
+      renderSidebarView();
+    });
+
+    // 右键菜单
+    card.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showContextMenu(e.clientX, e.clientY, {
+        type: 'folder',
+        id: folder.id,
+        title: folder.title,
+      });
+    });
+
+    grid.appendChild(card);
+  });
+
+  // 再放链接
+  links.forEach(item => {
+    grid.appendChild(createBookmarkLink(item));
+  });
+
+  if (subFolders.length === 0 && links.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><p>此文件夹为空</p></div>';
+  }
 }
 
 // ============================================
@@ -350,6 +426,15 @@ function createBookmarkLink(item) {
   // 拖拽属性
   a.draggable = true;
 
+  // Ctrl/Cmd 点击批量选择（不打开链接）
+  a.addEventListener('click', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      a.classList.toggle('selected');
+      updateBatchBar();
+    }
+  });
+
   // 右键菜单
   a.addEventListener('contextmenu', (e) => {
     e.preventDefault();
@@ -391,8 +476,10 @@ function createFolderCard(folder, parentContainer) {
   // 点击展开/收起
   card.addEventListener('click', (e) => {
     e.preventDefault();
-    // 查找已存在的展开面板
-    const existingPanel = parentContainer.querySelector(`.folder-expand-panel[data-folder-id="${folder.id}"]`);
+    // 查找已存在的展开面板（紧跟在卡片后面）
+    const existingPanel = card.nextElementSibling && card.nextElementSibling.classList.contains('folder-expand-panel')
+      ? card.nextElementSibling
+      : null;
     if (existingPanel) {
       // 收起
       card.classList.remove('folder-expanded');
@@ -413,13 +500,8 @@ function createFolderCard(folder, parentContainer) {
       const panelBody = createElement('div', { className: 'folder-expand-body' });
       renderFolderContent(panelBody, folder.children || []);
       panel.appendChild(panelBody);
-      // 插入到网格后面
-      const grid = card.closest('.row-items');
-      if (grid && grid.nextSibling) {
-        parentContainer.insertBefore(panel, grid.nextSibling);
-      } else {
-        parentContainer.appendChild(panel);
-      }
+      // 插入到被点击的卡片后面（就地展开）
+      card.insertAdjacentElement('afterend', panel);
     }
   });
 
@@ -916,5 +998,100 @@ function enableFolderDrag(container) {
     section.setAttribute('draggable', 'true');
     const header = section.querySelector('.row-header');
     if (header) header.style.cursor = 'grab';
+  });
+}
+
+// ============================================
+// 批量选择 + 批量删除
+// Ctrl/Cmd + 点击选中书签，底部出现操作栏
+// ============================================
+
+/**
+ * 更新批量操作栏显示
+ */
+function updateBatchBar() {
+  const selected = document.querySelectorAll('.bookmark-item.selected');
+  const bar = document.getElementById('batch-bar');
+  const count = document.getElementById('batch-count');
+
+  if (selected.length > 0) {
+    bar.classList.remove('hidden');
+    count.textContent = selected.length;
+  } else {
+    bar.classList.add('hidden');
+  }
+}
+
+/**
+ * 初始化批量操作
+ */
+function initBatchActions() {
+  // 全选当前可见的书签
+  document.getElementById('batch-select-all').addEventListener('click', () => {
+    const activeLayout = document.querySelector('.bookmark-layout.active');
+    if (!activeLayout) return;
+    activeLayout.querySelectorAll('.bookmark-item:not(.folder-card)').forEach(item => {
+      if (!item.classList.contains('row-hidden')) {
+        item.classList.add('selected');
+      }
+    });
+    updateBatchBar();
+  });
+
+  // 取消选择
+  document.getElementById('batch-deselect').addEventListener('click', () => {
+    document.querySelectorAll('.bookmark-item.selected').forEach(item => {
+      item.classList.remove('selected');
+    });
+    updateBatchBar();
+  });
+
+  // 批量删除
+  document.getElementById('batch-delete').addEventListener('click', async () => {
+    const selected = document.querySelectorAll('.bookmark-item.selected');
+    if (selected.length === 0) return;
+
+    if (!confirm(`确定删除选中的 ${selected.length} 个书签吗？此操作不可撤销。`)) return;
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const item of selected) {
+      try {
+        const id = item.dataset.id;
+        if (id && id !== '__uncategorized__') {
+          await chrome.bookmarks.remove(id);
+          successCount++;
+        }
+      } catch {
+        failCount++;
+      }
+    }
+
+    // 清除选中状态
+    document.querySelectorAll('.bookmark-item.selected').forEach(item => {
+      item.classList.remove('selected');
+    });
+    updateBatchBar();
+
+    // 刷新书签
+    await loadBookmarks();
+    renderQuickAccess();
+
+    if (failCount > 0) {
+      showToast(`已删除 ${successCount} 个，${failCount} 个失败`);
+    } else {
+      showToast(`已删除 ${successCount} 个书签`);
+    }
+  });
+
+  // ESC 取消选择
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.bookmark-item.selected').forEach(item => {
+        item.classList.remove('selected');
+      });
+      updateBatchBar();
+    }
   });
 }

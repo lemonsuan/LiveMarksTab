@@ -60,28 +60,28 @@ function registerBookmarkListeners() {
   // 新增书签
   chrome.bookmarks.onCreated.addListener((id, bookmark) => {
     if (_syncLock) return; // UI 发起的变更，跳过
-    console.log('[Sync] 外部新增书签:', id, bookmark.title);
+    // console.log('[Sync] 外部新增书签:', id, bookmark.title);
     loadBookmarks();
   });
 
   // 删除书签
   chrome.bookmarks.onRemoved.addListener((id, removeInfo) => {
     if (_syncLock) return;
-    console.log('[Sync] 外部删除书签:', id);
+    // console.log('[Sync] 外部删除书签:', id);
     loadBookmarks();
   });
 
   // 修改书签（标题、URL）
   chrome.bookmarks.onChanged.addListener((id, changeInfo) => {
     if (_syncLock) return;
-    console.log('[Sync] 外部修改书签:', id, changeInfo);
+    // console.log('[Sync] 外部修改书签:', id, changeInfo);
     loadBookmarks();
   });
 
   // 移动书签（更换父文件夹或位置）
   chrome.bookmarks.onMoved.addListener((id, moveInfo) => {
     if (_syncLock) return;
-    console.log('[Sync] 外部移动书签:', id, moveInfo);
+    // console.log('[Sync] 外部移动书签:', id, moveInfo);
     loadBookmarks();
   });
 
@@ -89,7 +89,7 @@ function registerBookmarkListeners() {
   if (chrome.bookmarks.onChildrenReordered) {
     chrome.bookmarks.onChildrenReordered.addListener((id, reorderInfo) => {
       if (_syncLock) return;
-      console.log('[Sync] 外部重排书签:', id);
+      // console.log('[Sync] 外部重排书签:', id);
       loadBookmarks();
     });
   }
