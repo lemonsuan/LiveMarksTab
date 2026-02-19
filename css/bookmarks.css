@@ -236,63 +236,86 @@
 }
 
 /* ============================================
-   布局 B: 侧边栏
+   布局 B: 面包屑 + 平铺导航
    ============================================ */
 #layout-sidebar.active {
+  display: block;
+}
+
+/* 面包屑导航 */
+.sidebar-breadcrumb {
   display: flex;
-  min-height: 50vh;
-  max-height: calc(100vh - 120px);
-  gap: 0;
-}
-
-.sidebar-nav {
-  width: var(--sidebar-width);
-  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--text-muted);
   background: var(--bg-card);
-  border-radius: var(--radius-md);
-  margin-right: 16px;
-  padding: 8px;
-  overflow-y: auto;
   border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
-.sidebar-nav-item {
+.breadcrumb-item {
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.breadcrumb-item:hover {
+  color: var(--accent);
+}
+
+.breadcrumb-item.current {
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: default;
+}
+
+.breadcrumb-sep {
+  color: var(--text-muted);
+  opacity: 0.5;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+/* 平铺网格 */
+.sidebar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 6px;
+  animation: fadeInUp 0.2s var(--ease-out);
+}
+
+/* 文件夹入口卡片 */
+.sidebar-folder-card {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
   cursor: pointer;
-  color: var(--text-secondary);
   font-size: 13px;
   font-weight: 500;
-  transition: all var(--transition-fast);
-  border-radius: var(--radius-sm);
-  margin-bottom: 2px;
-}
-
-.sidebar-nav-item:hover {
-  background: var(--bg-card-hover);
   color: var(--text-primary);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
 }
 
-.sidebar-nav-item.active {
+.sidebar-folder-card:hover {
+  border-color: var(--accent);
   background: var(--accent-subtle);
-  color: var(--accent);
-  font-weight: 600;
 }
 
-.sidebar-content {
-  flex: 1;
-  background: var(--bg-card);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  padding: 16px 20px;
-  overflow-y: auto;
-}
-
-/* 侧边栏内容区：单列列表 */
-.sidebar-content .bookmark-item {
-  width: 100%;
+.sidebar-folder-card .folder-count {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 400;
 }
 
 /* ============================================
@@ -407,23 +430,23 @@
    背景图兼容
    ============================================ */
 body.has-bg .bookmark-card,
-body.has-bg .sidebar-nav,
-body.has-bg .sidebar-content,
+body.has-bg .sidebar-breadcrumb,
+body.has-bg .sidebar-folder-card,
 body.has-bg .row-section {
   backdrop-filter: blur(16px) saturate(1.6);
   -webkit-backdrop-filter: blur(16px) saturate(1.6);
 }
 
 [data-theme="dark"] body.has-bg .bookmark-card,
-[data-theme="dark"] body.has-bg .sidebar-nav,
-[data-theme="dark"] body.has-bg .sidebar-content,
+[data-theme="dark"] body.has-bg .sidebar-breadcrumb,
+[data-theme="dark"] body.has-bg .sidebar-folder-card,
 [data-theme="dark"] body.has-bg .row-section {
   background: rgba(26, 27, 30, 0.75);
 }
 
 [data-theme="light"] body.has-bg .bookmark-card,
-[data-theme="light"] body.has-bg .sidebar-nav,
-[data-theme="light"] body.has-bg .sidebar-content,
+[data-theme="light"] body.has-bg .sidebar-breadcrumb,
+[data-theme="light"] body.has-bg .sidebar-folder-card,
 [data-theme="light"] body.has-bg .row-section {
   background: rgba(255, 255, 255, 0.75);
 }
@@ -440,15 +463,8 @@ body.has-bg .row-section {
     columns: 1;
   }
 
-  #layout-sidebar.active {
-    flex-direction: column;
-    height: auto;
-  }
-
-  .sidebar-nav {
-    width: 100%;
-    margin-right: 0;
-    margin-bottom: 12px;
+  #layout-sidebar .sidebar-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   }
 
   .row-items {

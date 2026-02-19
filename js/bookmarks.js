@@ -163,57 +163,125 @@ function renderFolderContent(container, items) {
 }
 
 // ============================================
-// 布局 B: 侧边栏
-// 左侧导航栏 (sidebar-nav) + 右侧内容区 (sidebar-content)
-// 点击导航项切换右侧显示的文件夹内容
+// 布局 B: 面包屑 + 平铺导航
+// 点击文件夹 → 钻入，面包屑更新
+// 当前文件夹内容用网格平铺
 // ============================================
 
-let activeSidebarFolderId = null;
 let _sidebarFolders = [];
+let _sidebarPath = []; // 面包屑路径栈 [{id, title, children}]
 
 function renderSidebarLayout(folders) {
-  const nav = document.getElementById('sidebar-nav');
-  const content = document.getElementById('sidebar-content');
-  nav.innerHTML = '';
-  content.innerHTML = '';
   _sidebarFolders = folders;
-
-  if (folders.length === 0) return;
-
-  folders.forEach((folder, index) => {
-    const navItem = createElement('div', {
-      className: 'sidebar-nav-item' + (index === 0 ? ' active' : ''),
-      dataset: { id: folder.id },
-      onClick: () => selectSidebarFolder(folder.id),
-    }, [createFolderIcon(), document.createTextNode(folder.title || '未命名')]);
-    nav.appendChild(navItem);
-  });
-
-  activeSidebarFolderId = folders[0].id;
-  renderSidebarContent(content, folders[0].children || []);
+  // 初始化：显示根级（所有一级文件夹和链接）
+  _sidebarPath = [{
+    id: '__root__',
+    title: '全部书签',
+    children: folders.flatMap(f => {
+      // 把一级文件夹本身作为子项展示
+      return [f];
+    }),
+  }];
+  renderSidebarView();
 }
 
-function selectSidebarFolder(folderId) {
-  activeSidebarFolderId = folderId;
-  document.querySelectorAll('.sidebar-nav-item').forEach(item => {
-    item.classList.toggle('active', item.dataset.id === folderId);
-  });
-  const folder = _sidebarFolders.find(f => f.id === folderId);
-  const content = document.getElementById('sidebar-content');
-  content.innerHTML = '';
-  if (folder) {
-    renderSidebarContent(content, folder.children || []);
-  }
-}
+/**
+ * 渲染当前面包屑路径对应的视图
+ */
+function renderSidebarView() {
+  const breadcrumb = document.getElementById('sidebar-breadcrumb');
+  const grid = document.getElementById('sidebar-grid');
+  if (!breadcrumb || !grid) return;
 
-function renderSidebarContent(container, items) {
-  items.forEach(item => {
-    if (item.url) {
-      container.appendChild(createBookmarkLink(item));
-    } else if (item.children) {
-      container.appendChild(createNestedFolder(item));
+  const currentLevel = _sidebarPath[_sidebarPath.length - 1];
+  const items = currentLevel.children || [];
+
+  // 渲染面包屑
+  breadcrumb.innerHTML = '';
+  _sidebarPath.forEach((level, index) => {
+    const isLast = index === _sidebarPath.length - 1;
+
+    const crumb = createElement('span', {
+      className: 'breadcrumb-item' + (isLast ? ' current' : ''),
+    }, level.title || '未命名');
+
+    if (!isLast) {
+      crumb.addEventListener('click', () => {
+        // 点击面包屑：回退到该层级
+        _sidebarPath = _sidebarPath.slice(0, index + 1);
+        renderSidebarView();
+      });
+    }
+
+    breadcrumb.appendChild(crumb);
+
+    if (!isLast) {
+      breadcrumb.appendChild(
+        createElement('span', { className: 'breadcrumb-sep' }, '›')
+      );
     }
   });
+
+  // 渲染网格内容
+  grid.innerHTML = '';
+  grid.style.animation = 'none';
+  requestAnimationFrame(() => { grid.style.animation = ''; });
+
+  const subFolders = [];
+  const links = [];
+  items.forEach(item => {
+    if (item.children) subFolders.push(item);
+    else if (item.url) links.push(item);
+  });
+
+  // 先放文件夹
+  subFolders.forEach(folder => {
+    const card = createElement('div', {
+      className: 'sidebar-folder-card',
+      dataset: { id: folder.id },
+    });
+
+    card.appendChild(createFolderIcon());
+    card.appendChild(createElement('span', {}, folder.title || '未命名'));
+
+    const count = (folder.children || []).length;
+    if (count > 0) {
+      card.appendChild(
+        createElement('span', { className: 'folder-count' }, String(count))
+      );
+    }
+
+    card.addEventListener('click', () => {
+      // 钻入子文件夹
+      _sidebarPath.push({
+        id: folder.id,
+        title: folder.title,
+        children: folder.children || [],
+      });
+      renderSidebarView();
+    });
+
+    // 右键菜单
+    card.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showContextMenu(e.clientX, e.clientY, {
+        type: 'folder',
+        id: folder.id,
+        title: folder.title,
+      });
+    });
+
+    grid.appendChild(card);
+  });
+
+  // 再放链接
+  links.forEach(item => {
+    grid.appendChild(createBookmarkLink(item));
+  });
+
+  if (subFolders.length === 0 && links.length === 0) {
+    grid.innerHTML = '<div class="empty-state"><p>此文件夹为空</p></div>';
+  }
 }
 
 // ============================================
