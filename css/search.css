@@ -169,10 +169,8 @@
 
 .site-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 16px;
-  max-width: 640px;
-  margin: 0 auto;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 12px;
 }
 
 .site-item {
