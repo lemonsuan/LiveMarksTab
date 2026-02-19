@@ -186,8 +186,9 @@
    ============================================ */
 #layout-grid.active {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  align-items: start; /* 卡片高度各自适应 */
 }
 
 .bookmark-card {
@@ -236,7 +237,8 @@
    ============================================ */
 #layout-sidebar.active {
   display: flex;
-  height: calc(100vh - 200px);
+  min-height: 50vh;
+  max-height: calc(100vh - 120px);
   gap: 0;
 }
 
@@ -322,8 +324,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 0;
-  margin-bottom: 8px;
+  padding: 4px 0 8px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--border);
 }
 
 .row-title {
