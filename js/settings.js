@@ -234,6 +234,9 @@ function initSettings() {
   // ---- 快捷入口 Tab ----
   renderShortcuts();
 
+  // ---- 数据导出/导入 ----
+  initDataSync();
+
   // 加载已保存的设置
   loadSettings();
 }
@@ -384,4 +387,108 @@ function renderMultiEngineList() {
     label.appendChild(name);
     container.appendChild(label);
   });
+}
+
+// ============================================
+// 数据导出/导入
+// ============================================
+
+/**
+ * 初始化导出/导入功能
+ */
+function initDataSync() {
+  // 导出设置
+  document.getElementById("btn-export-settings").addEventListener("click", () => {
+    chrome.storage.local.get(null, (data) => {
+      const exportData = {
+        _meta: {
+          app: "LiveMarksTab",
+          version: "1.0.0",
+          exportedAt: new Date().toISOString(),
+          type: "settings",
+        },
+        settings: data,
+      };
+      downloadJSON(exportData, `livemarks-settings-${formatDate()}.json`);
+      showToast("设置已导出");
+    });
+  });
+
+  // 导入设置
+  const importInput = document.getElementById("import-file-input");
+  document.getElementById("btn-import-settings").addEventListener("click", () => {
+    importInput.click();
+  });
+
+  importInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target.result);
+
+        // 验证格式
+        if (!data._meta || data._meta.app !== "LiveMarksTab") {
+          showToast("无效的设置文件");
+          return;
+        }
+
+        if (data._meta.type === "settings" && data.settings) {
+          chrome.storage.local.set(data.settings, () => {
+            showToast("设置已导入，正在刷新...");
+            setTimeout(() => location.reload(), 800);
+          });
+        } else {
+          showToast("不支持的文件类型");
+        }
+      } catch {
+        showToast("文件解析失败，请检查格式");
+      }
+    };
+    reader.readAsText(file);
+    importInput.value = ""; // 重置，允许再次选择同一文件
+  });
+
+  // 导出书签
+  document.getElementById("btn-export-bookmarks").addEventListener("click", async () => {
+    try {
+      const tree = await chrome.bookmarks.getTree();
+      const exportData = {
+        _meta: {
+          app: "LiveMarksTab",
+          version: "1.0.0",
+          exportedAt: new Date().toISOString(),
+          type: "bookmarks",
+        },
+        bookmarks: tree,
+      };
+      downloadJSON(exportData, `livemarks-bookmarks-${formatDate()}.json`);
+      showToast("书签已导出");
+    } catch (err) {
+      showToast("导出失败: " + err.message);
+    }
+  });
+}
+
+/**
+ * 下载 JSON 文件
+ */
+function downloadJSON(data, filename) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * 格式化日期为 YYYYMMDD
+ */
+function formatDate() {
+  const d = new Date();
+  return `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
 }

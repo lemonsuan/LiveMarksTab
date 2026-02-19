@@ -318,6 +318,7 @@
             <button class="settings-tab" data-tab="layout">布局</button>
             <button class="settings-tab" data-tab="search">搜索引擎</button>
             <button class="settings-tab" data-tab="shortcuts">快捷入口</button>
+            <button class="settings-tab" data-tab="sync">数据</button>
             <div class="settings-sidebar-spacer"></div>
             <button
               id="btn-reset-settings"
@@ -504,6 +505,38 @@
                 <div class="shortcut-grid" id="shortcut-grid">
                   <!-- JS 动态生成 -->
                 </div>
+              </div>
+            </div>
+
+            <!-- Tab 5: 数据导出/导入 -->
+            <div class="settings-tab-content" data-tab="sync">
+              <div class="setting-group">
+                <label class="setting-label">导出设置</label>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+                  将布局、主题、配色、背景等自定义设置导出为 JSON 文件，用于在其他设备上恢复。
+                </p>
+                <button id="btn-export-settings" class="btn btn-secondary" style="width: 100%;">
+                  📦 导出设置文件
+                </button>
+              </div>
+              <div class="setting-group">
+                <label class="setting-label">导入设置</label>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+                  从 JSON 文件恢复之前导出的设置。导入后会立即生效。
+                </p>
+                <button id="btn-import-settings" class="btn btn-secondary" style="width: 100%;">
+                  📥 导入设置文件
+                </button>
+                <input type="file" id="import-file-input" accept=".json" style="display: none" />
+              </div>
+              <div class="setting-group">
+                <label class="setting-label">导出书签</label>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+                  将所有 Chrome 书签导出为 JSON 文件备份。
+                </p>
+                <button id="btn-export-bookmarks" class="btn btn-secondary" style="width: 100%;">
+                  🔖 导出书签备份
+                </button>
               </div>
             </div>
           </div>
