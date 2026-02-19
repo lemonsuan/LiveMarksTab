@@ -31,6 +31,26 @@
   text-align: center;
 }
 
+/* 一言 */
+.hitokoto {
+  margin-bottom: 20px;
+  text-align: center;
+  max-width: 500px;
+  min-height: 20px;
+}
+
+.hitokoto a {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+  line-height: 1.6;
+  transition: color var(--transition-fast);
+}
+
+.hitokoto a:hover {
+  color: var(--text-secondary);
+}
+
 /* 搜索容器 */
 .search-container {
   width: 100%;

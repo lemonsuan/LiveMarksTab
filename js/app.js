@@ -62,6 +62,26 @@ function renderGreeting() {
   else text = '晚上好 🌙';
 
   el.textContent = text;
+
+  // 加载一言
+  fetchHitokoto();
+}
+
+/**
+ * 获取一言 (hitokoto.cn)
+ */
+async function fetchHitokoto() {
+  try {
+    const response = await fetch('https://v1.hitokoto.cn');
+    const { uuid, hitokoto: hitokotoText } = await response.json();
+    const el = document.getElementById('hitokoto_text');
+    if (el) {
+      el.href = `https://hitokoto.cn/?uuid=${uuid}`;
+      el.textContent = hitokotoText;
+    }
+  } catch {
+    // 网络失败静默忽略
+  }
 }
 
 /**
