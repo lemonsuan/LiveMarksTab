@@ -15,7 +15,7 @@ const DEFAULT_SETTINGS = {
   layout: "rows",
   searchEngine: "google",
   theme: "light",
-  colorScheme: "indigo",
+  colorScheme: "blue",
   bgType: "none",
   bgValue: "",
 };
