@@ -398,6 +398,29 @@
   height: 16px;
 }
 
+/* 自定义引擎删除按钮 */
+.custom-engine-del {
+  margin-left: auto;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: color var(--transition-fast), background var(--transition-fast);
+}
+
+.custom-engine-del:hover {
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* 自定义引擎表单 */
+.custom-engine-form {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
 /* ============================================
    快捷入口 Tab
    ============================================ */

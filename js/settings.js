@@ -13,7 +13,7 @@
 // 默认设置
 const DEFAULT_SETTINGS = {
   layout: "rows",
-  searchEngine: "google",
+  searchEngine: "baidu",
   theme: "light",
   colorScheme: "blue",
   bgType: "none",
@@ -355,7 +355,7 @@ function setLayout(layout) {
 }
 
 /**
- * 渲染多引擎搜索勾选列表
+ * 渲染多引擎搜索勾选列表 + 自定义引擎管理
  */
 function renderMultiEngineList() {
   const container = document.getElementById("multi-engine-list");
@@ -385,7 +385,77 @@ function renderMultiEngineList() {
     label.appendChild(checkbox);
     label.appendChild(icon);
     label.appendChild(name);
+
+    // 自定义引擎显示删除按钮
+    if (engine.custom) {
+      const delBtn = createElement("span", {
+        className: "custom-engine-del",
+        title: "删除此引擎",
+        onClick: (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (confirm(`确定删除搜索引擎「${engine.name}」吗？`)) {
+            removeCustomEngine(engine.id);
+            renderMultiEngineList();
+            renderEngineList();
+            // 更新设置面板中的引擎下拉
+            const engineSelect = document.getElementById("setting-engine");
+            if (engineSelect) {
+              engineSelect.innerHTML = "";
+              SEARCH_ENGINES.forEach((en) => {
+                engineSelect.appendChild(createElement("option", { value: en.id }, en.name));
+              });
+            }
+          }
+        },
+      });
+      delBtn.textContent = "✕";
+      label.appendChild(delBtn);
+    }
+
     container.appendChild(label);
+  });
+
+  // 添加自定义引擎的表单
+  const addForm = createElement("div", { className: "custom-engine-form" });
+  addForm.innerHTML = `
+    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px;">添加自定义搜索引擎：</div>
+    <input type="text" id="custom-engine-name" placeholder="名称，如：知乎" style="width: 100%; margin-bottom: 4px; padding: 6px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-input); color: var(--text-primary);" />
+    <input type="text" id="custom-engine-url" placeholder="搜索URL，如：https://www.zhihu.com/search?q=" style="width: 100%; margin-bottom: 6px; padding: 6px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-input); color: var(--text-primary);" />
+    <button id="custom-engine-add" class="btn btn-secondary" style="width: 100%; font-size: 12px; padding: 6px;">+ 添加引擎</button>
+  `;
+  container.appendChild(addForm);
+
+  // 绑定添加按钮
+  requestAnimationFrame(() => {
+    const addBtn = document.getElementById("custom-engine-add");
+    if (addBtn) {
+      addBtn.addEventListener("click", () => {
+        const nameInput = document.getElementById("custom-engine-name");
+        const urlInput = document.getElementById("custom-engine-url");
+        const name = nameInput.value.trim();
+        const url = urlInput.value.trim();
+
+        if (!name) { showToast("请输入引擎名称"); return; }
+        if (!url || !url.startsWith("http")) { showToast("请输入有效的搜索 URL"); return; }
+
+        addCustomEngine(name, url);
+        showToast(`已添加搜索引擎「${name}」`);
+
+        // 刷新 UI
+        renderMultiEngineList();
+        renderEngineList();
+        // 刷新设置面板中的引擎下拉
+        const engineSelect = document.getElementById("setting-engine");
+        if (engineSelect) {
+          engineSelect.innerHTML = "";
+          SEARCH_ENGINES.forEach((en) => {
+            engineSelect.appendChild(createElement("option", { value: en.id }, en.name));
+          });
+          engineSelect.value = currentEngineId;
+        }
+      });
+    }
   });
 }
 
