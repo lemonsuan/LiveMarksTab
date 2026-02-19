@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 6. 初始化书签清理面板
   initCleaner();
 
+  // 6.5 初始化批量操作
+  initBatchActions();
+
   // 7. 读取 Chrome 书签并渲染到三种布局容器
   await loadBookmarks();
 

@@ -152,6 +152,52 @@ body {
 }
 
 /* ============================================
+   批量操作栏
+   ============================================ */
+.batch-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 32px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+  z-index: 400;
+  animation: slideUp 0.2s var(--ease-out);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.batch-info {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.batch-info strong {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.batch-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* 书签选中态 */
+.bookmark-item.selected {
+  background: var(--accent-subtle);
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* ============================================
    Toast 通知
    ============================================ */
 .toast {

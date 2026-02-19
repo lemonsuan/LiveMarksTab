@@ -418,6 +418,15 @@ function createBookmarkLink(item) {
   // 拖拽属性
   a.draggable = true;
 
+  // Ctrl/Cmd 点击批量选择（不打开链接）
+  a.addEventListener('click', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      a.classList.toggle('selected');
+      updateBatchBar();
+    }
+  });
+
   // 右键菜单
   a.addEventListener('contextmenu', (e) => {
     e.preventDefault();
@@ -981,5 +990,100 @@ function enableFolderDrag(container) {
     section.setAttribute('draggable', 'true');
     const header = section.querySelector('.row-header');
     if (header) header.style.cursor = 'grab';
+  });
+}
+
+// ============================================
+// 批量选择 + 批量删除
+// Ctrl/Cmd + 点击选中书签，底部出现操作栏
+// ============================================
+
+/**
+ * 更新批量操作栏显示
+ */
+function updateBatchBar() {
+  const selected = document.querySelectorAll('.bookmark-item.selected');
+  const bar = document.getElementById('batch-bar');
+  const count = document.getElementById('batch-count');
+
+  if (selected.length > 0) {
+    bar.classList.remove('hidden');
+    count.textContent = selected.length;
+  } else {
+    bar.classList.add('hidden');
+  }
+}
+
+/**
+ * 初始化批量操作
+ */
+function initBatchActions() {
+  // 全选当前可见的书签
+  document.getElementById('batch-select-all').addEventListener('click', () => {
+    const activeLayout = document.querySelector('.bookmark-layout.active');
+    if (!activeLayout) return;
+    activeLayout.querySelectorAll('.bookmark-item:not(.folder-card)').forEach(item => {
+      if (!item.classList.contains('row-hidden')) {
+        item.classList.add('selected');
+      }
+    });
+    updateBatchBar();
+  });
+
+  // 取消选择
+  document.getElementById('batch-deselect').addEventListener('click', () => {
+    document.querySelectorAll('.bookmark-item.selected').forEach(item => {
+      item.classList.remove('selected');
+    });
+    updateBatchBar();
+  });
+
+  // 批量删除
+  document.getElementById('batch-delete').addEventListener('click', async () => {
+    const selected = document.querySelectorAll('.bookmark-item.selected');
+    if (selected.length === 0) return;
+
+    if (!confirm(`确定删除选中的 ${selected.length} 个书签吗？此操作不可撤销。`)) return;
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const item of selected) {
+      try {
+        const id = item.dataset.id;
+        if (id && id !== '__uncategorized__') {
+          await chrome.bookmarks.remove(id);
+          successCount++;
+        }
+      } catch {
+        failCount++;
+      }
+    }
+
+    // 清除选中状态
+    document.querySelectorAll('.bookmark-item.selected').forEach(item => {
+      item.classList.remove('selected');
+    });
+    updateBatchBar();
+
+    // 刷新书签
+    await loadBookmarks();
+    renderQuickAccess();
+
+    if (failCount > 0) {
+      showToast(`已删除 ${successCount} 个，${failCount} 个失败`);
+    } else {
+      showToast(`已删除 ${successCount} 个书签`);
+    }
+  });
+
+  // ESC 取消选择
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.bookmark-item.selected').forEach(item => {
+        item.classList.remove('selected');
+      });
+      updateBatchBar();
+    }
   });
 }
