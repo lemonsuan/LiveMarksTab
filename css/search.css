@@ -236,6 +236,31 @@
   max-width: 80px;
 }
 
+/* 添加按钮 */
+.site-add-icon {
+  background: transparent !important;
+  border: 2px dashed var(--border);
+  box-shadow: none;
+  color: var(--text-muted);
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.site-add-btn:hover .site-add-icon {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+body.has-bg .site-add-icon {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.6);
+  background: transparent !important;
+}
+
+body.has-bg .site-add-btn:hover .site-add-icon {
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #ffffff;
+}
+
 /* ============================================
    背景图兼容 — 动态对比度处理
    ============================================ */

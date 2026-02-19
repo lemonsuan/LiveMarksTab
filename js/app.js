@@ -87,60 +87,192 @@ async function fetchHitokoto() {
   }
 }
 
+// 默认快速访问站点（首次使用时的初始数据）
+const DEFAULT_QUICK_SITES = [
+  { title: '百度', url: 'https://www.baidu.com' },
+  { title: 'Google', url: 'https://www.google.com' },
+  { title: 'GitHub', url: 'https://github.com' },
+  { title: '知乎', url: 'https://www.zhihu.com' },
+  { title: '哔哩哔哩', url: 'https://www.bilibili.com' },
+  { title: '微博', url: 'https://weibo.com' },
+  { title: '掘金', url: 'https://juejin.cn' },
+  { title: '淘宝', url: 'https://www.taobao.com' },
+];
+
 /**
- * 渲染快速访问网格 — 从书签树中提取一级文件夹下的前几个链接
- * 简单策略：取书签栏前 8 个直接链接
+ * 渲染快速访问网格 — 用户可自定义站点
+ * 数据存储在 chrome.storage.local.quickSites
  */
 function renderQuickAccess() {
   const grid = document.getElementById('site-grid');
-  if (!grid || !bookmarkTreeCache || bookmarkTreeCache.length === 0) return;
+  if (!grid) return;
 
-  grid.innerHTML = '';
+  chrome.storage.local.get(['quickSites'], (data) => {
+    let sites = data.quickSites;
 
-  const root = bookmarkTreeCache[0];
-  const quickLinks = [];
+    // 首次使用：从默认列表初始化
+    if (!sites || !Array.isArray(sites)) {
+      sites = DEFAULT_QUICK_SITES;
+      chrome.storage.local.set({ quickSites: sites });
+    }
 
-  // 从各个根子节点中提取直接链接
-  if (root.children) {
-    root.children.forEach(rootChild => {
-      if (rootChild.children) {
-        rootChild.children.forEach(item => {
-          if (item.url && quickLinks.length < 8) {
-            quickLinks.push(item);
-          }
-        });
-      }
+    grid.innerHTML = '';
+
+    // 渲染已有站点
+    sites.forEach((site, index) => {
+      const link = createElement('a', {
+        className: 'site-item',
+        href: site.url,
+        title: site.title + '\n' + site.url,
+      });
+
+      const iconWrap = createElement('div', { className: 'site-icon' });
+      const img = createElement('img', {
+        src: getFaviconUrl(site.url, 32),
+        alt: '',
+      });
+      img.onerror = function () {
+        this.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%239898a6" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>';
+      };
+      iconWrap.appendChild(img);
+
+      const name = createElement('span', { className: 'site-name' }, site.title || '未命名');
+
+      link.appendChild(iconWrap);
+      link.appendChild(name);
+
+      // 右键菜单：编辑/删除
+      link.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        showQuickSiteMenu(e.clientX, e.clientY, index);
+      });
+
+      grid.appendChild(link);
     });
-  }
 
-  if (quickLinks.length === 0) {
-    // 没有直接链接，隐藏快速访问区域
-    const section = document.getElementById('quick-access');
-    if (section) section.style.display = 'none';
-    return;
-  }
+    // 添加按钮（如果不足 8 个）
+    if (sites.length < 8) {
+      const addBtn = createElement('a', {
+        className: 'site-item site-add-btn',
+        href: 'javascript:void(0)',
+        title: '添加快捷方式',
+      });
 
-  quickLinks.forEach(item => {
-    const link = createElement('a', {
-      className: 'site-item',
-      href: item.url,
-      title: item.title,
+      const iconWrap = createElement('div', { className: 'site-icon site-add-icon' });
+      iconWrap.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>';
+
+      const name = createElement('span', { className: 'site-name' }, '添加');
+
+      addBtn.appendChild(iconWrap);
+      addBtn.appendChild(name);
+
+      addBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showQuickSiteDialog();
+      });
+
+      grid.appendChild(addBtn);
+    }
+  });
+}
+
+/**
+ * 显示快速访问站点的右键菜单
+ */
+function showQuickSiteMenu(x, y, siteIndex) {
+  // 移除已有的菜单
+  const existing = document.getElementById('quick-site-menu');
+  if (existing) existing.remove();
+
+  const menu = createElement('div', {
+    id: 'quick-site-menu',
+    className: 'context-menu',
+  });
+
+  // 编辑
+  const editItem = createElement('div', { className: 'context-menu-item' });
+  editItem.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><span>编辑</span>';
+  editItem.addEventListener('click', () => {
+    menu.remove();
+    showQuickSiteDialog(siteIndex);
+  });
+
+  // 删除
+  const delItem = createElement('div', { className: 'context-menu-item' });
+  delItem.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m5-3h4a1 1 0 0 1 1 1v1H9V4a1 1 0 0 1 1-1z"/></svg><span>删除</span>';
+  delItem.addEventListener('click', () => {
+    menu.remove();
+    chrome.storage.local.get(['quickSites'], (data) => {
+      const sites = data.quickSites || [];
+      sites.splice(siteIndex, 1);
+      chrome.storage.local.set({ quickSites: sites }, () => {
+        renderQuickAccess();
+      });
     });
+    showToast('已删除');
+  });
 
-    const iconWrap = createElement('div', { className: 'site-icon' });
-    const img = createElement('img', {
-      src: getFaviconUrl(item.url, 32),
-      alt: '',
+  menu.appendChild(editItem);
+  menu.appendChild(delItem);
+
+  menu.style.left = x + 'px';
+  menu.style.top = y + 'px';
+  document.body.appendChild(menu);
+
+  // 点击其他区域关闭
+  const closeMenu = () => {
+    menu.remove();
+    document.removeEventListener('click', closeMenu);
+  };
+  setTimeout(() => document.addEventListener('click', closeMenu), 0);
+}
+
+/**
+ * 显示添加/编辑快速访问站点弹窗
+ * @param {number} [editIndex] - 如果传入则为编辑模式
+ */
+function showQuickSiteDialog(editIndex) {
+  const isEdit = editIndex !== undefined;
+
+  // 获取当前数据
+  chrome.storage.local.get(['quickSites'], (data) => {
+    const sites = data.quickSites || [];
+    const site = isEdit ? sites[editIndex] : { title: '', url: '' };
+
+    const titleText = isEdit ? '编辑快捷方式' : '添加快捷方式';
+    const result = prompt(`${titleText}\n\n请输入名称和网址，用逗号分隔：\n例如：知乎,https://www.zhihu.com`,
+      isEdit ? `${site.title},${site.url}` : '');
+
+    if (!result) return;
+
+    const parts = result.split(',');
+    if (parts.length < 2) {
+      showToast('格式错误，请用逗号分隔名称和网址');
+      return;
+    }
+
+    const title = parts[0].trim();
+    let url = parts.slice(1).join(',').trim();
+
+    if (!title || !url) {
+      showToast('名称和网址不能为空');
+      return;
+    }
+
+    // 自动补全 https://
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+
+    if (isEdit) {
+      sites[editIndex] = { title, url };
+    } else {
+      sites.push({ title, url });
+    }
+
+    chrome.storage.local.set({ quickSites: sites }, () => {
+      renderQuickAccess();
+      showToast(isEdit ? '已更新' : '已添加');
     });
-    img.onerror = function () {
-      this.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%239898a6" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>';
-    };
-    iconWrap.appendChild(img);
-
-    const name = createElement('span', { className: 'site-name' }, item.title || new URL(item.url).hostname);
-
-    link.appendChild(iconWrap);
-    link.appendChild(name);
-    grid.appendChild(link);
   });
 }
