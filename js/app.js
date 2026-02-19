@@ -228,51 +228,63 @@ function showQuickSiteMenu(x, y, siteIndex) {
 }
 
 /**
- * 显示添加/编辑快速访问站点弹窗
+ * 显示添加/编辑快速访问站点弹窗（复用书签编辑弹窗样式）
  * @param {number} [editIndex] - 如果传入则为编辑模式
  */
 function showQuickSiteDialog(editIndex) {
   const isEdit = editIndex !== undefined;
 
-  // 获取当前数据
   chrome.storage.local.get(['quickSites'], (data) => {
     const sites = data.quickSites || [];
     const site = isEdit ? sites[editIndex] : { title: '', url: '' };
 
-    const titleText = isEdit ? '编辑快捷方式' : '添加快捷方式';
-    const result = prompt(`${titleText}\n\n请输入名称和网址，用逗号分隔：\n例如：知乎,https://www.zhihu.com`,
-      isEdit ? `${site.title},${site.url}` : '');
+    const overlay = document.getElementById('edit-overlay');
+    const titleEl = document.getElementById('edit-title');
+    const nameInput = document.getElementById('edit-name');
+    const urlInput = document.getElementById('edit-url');
+    const urlGroup = document.getElementById('edit-url-group');
+    const saveBtn = document.getElementById('edit-save');
 
-    if (!result) return;
+    titleEl.textContent = isEdit ? '编辑快捷方式' : '添加快捷方式';
+    nameInput.value = site.title || '';
+    urlGroup.style.display = '';
+    urlInput.value = site.url || '';
 
-    const parts = result.split(',');
-    if (parts.length < 2) {
-      showToast('格式错误，请用逗号分隔名称和网址');
-      return;
-    }
+    overlay.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      overlay.classList.add('visible');
+      nameInput.focus();
+    });
 
-    const title = parts[0].trim();
-    let url = parts.slice(1).join(',').trim();
+    // 替换保存按钮的事件（一次性）
+    const newSave = saveBtn.cloneNode(true);
+    saveBtn.parentNode.replaceChild(newSave, saveBtn);
 
-    if (!title || !url) {
-      showToast('名称和网址不能为空');
-      return;
-    }
+    newSave.addEventListener('click', () => {
+      const title = nameInput.value.trim();
+      let url = urlInput.value.trim();
 
-    // 自动补全 https://
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      url = 'https://' + url;
-    }
+      if (!title) { showToast('请输入名称'); return; }
+      if (!url) { showToast('请输入网址'); return; }
 
-    if (isEdit) {
-      sites[editIndex] = { title, url };
-    } else {
-      sites.push({ title, url });
-    }
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+      }
 
-    chrome.storage.local.set({ quickSites: sites }, () => {
-      renderQuickAccess();
-      showToast(isEdit ? '已更新' : '已添加');
+      if (isEdit) {
+        sites[editIndex] = { title, url };
+      } else {
+        sites.push({ title, url });
+      }
+
+      chrome.storage.local.set({ quickSites: sites }, () => {
+        renderQuickAccess();
+        showToast(isEdit ? '已更新' : '已添加');
+      });
+
+      // 关闭弹窗
+      overlay.classList.remove('visible');
+      setTimeout(() => overlay.classList.add('hidden'), 250);
     });
   });
 }
