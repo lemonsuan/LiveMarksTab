@@ -59,7 +59,7 @@ function initHelp() {
   const btnHelp = document.getElementById('btn-help');
   const helpOverlay = document.getElementById('help-overlay');
   const helpCloseBtn = document.getElementById('help-close-btn');
-  const helpNoShowCheck = document.getElementById('help-no-show-check');
+
 
   if (!btnHelp || !helpOverlay) return;
 
@@ -73,10 +73,6 @@ function initHelp() {
   function closeHelp() {
     helpOverlay.classList.remove('visible');
     setTimeout(() => helpOverlay.classList.add('hidden'), 250);
-    // 保存"不再显示"偏好
-    if (helpNoShowCheck && helpNoShowCheck.checked) {
-      chrome.storage.local.set({ helpDismissed: true });
-    }
   }
 
   // 点击帮助按钮 → 打开
@@ -92,10 +88,11 @@ function initHelp() {
     if (e.target === helpOverlay) closeHelp();
   });
 
-  // 首次使用时自动显示帮助页
+  // 仅首次使用时自动弹出帮助页，弹出后立即标记
   chrome.storage.local.get(['helpDismissed'], (data) => {
     if (!data.helpDismissed) {
       openHelp();
+      chrome.storage.local.set({ helpDismissed: true });
     }
   });
 }
