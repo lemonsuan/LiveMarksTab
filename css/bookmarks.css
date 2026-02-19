@@ -159,7 +159,7 @@
   padding: 0 4px;
 }
 
-/* 文件夹展开面板 */
+/* 文件夹展开面板 — 就地展开，跨满网格整行 */
 .folder-expand-panel {
   margin: 8px 0;
   padding: 12px;
@@ -167,6 +167,8 @@
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   border-radius: var(--radius-sm);
+  grid-column: 1 / -1; /* 在 CSS Grid 中跨满整行 */
+  break-inside: avoid;  /* 在 CSS columns 瀑布流中不被截断 */
 }
 
 .folder-expand-header {

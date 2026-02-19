@@ -391,8 +391,10 @@ function createFolderCard(folder, parentContainer) {
   // 点击展开/收起
   card.addEventListener('click', (e) => {
     e.preventDefault();
-    // 查找已存在的展开面板
-    const existingPanel = parentContainer.querySelector(`.folder-expand-panel[data-folder-id="${folder.id}"]`);
+    // 查找已存在的展开面板（紧跟在卡片后面）
+    const existingPanel = card.nextElementSibling && card.nextElementSibling.classList.contains('folder-expand-panel')
+      ? card.nextElementSibling
+      : null;
     if (existingPanel) {
       // 收起
       card.classList.remove('folder-expanded');
@@ -413,13 +415,8 @@ function createFolderCard(folder, parentContainer) {
       const panelBody = createElement('div', { className: 'folder-expand-body' });
       renderFolderContent(panelBody, folder.children || []);
       panel.appendChild(panelBody);
-      // 插入到网格后面
-      const grid = card.closest('.row-items');
-      if (grid && grid.nextSibling) {
-        parentContainer.insertBefore(panel, grid.nextSibling);
-      } else {
-        parentContainer.appendChild(panel);
-      }
+      // 插入到被点击的卡片后面（就地展开）
+      card.insertAdjacentElement('afterend', panel);
     }
   });
 
