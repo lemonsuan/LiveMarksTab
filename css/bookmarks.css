@@ -185,10 +185,9 @@
    布局 A: 卡片网格
    ============================================ */
 #layout-grid.active {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
-  align-items: start; /* 卡片高度各自适应 */
+  display: block;
+  columns: 3;
+  column-gap: 16px;
 }
 
 .bookmark-card {
@@ -196,6 +195,8 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;
+  break-inside: avoid;
+  margin-bottom: 16px;
   transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
   animation: fadeInUp 0.3s var(--ease-out) both;
 }
@@ -434,7 +435,7 @@ body.has-bg .row-section {
   }
 
   #layout-grid.active {
-    grid-template-columns: 1fr;
+    columns: 1;
   }
 
   #layout-sidebar.active {
