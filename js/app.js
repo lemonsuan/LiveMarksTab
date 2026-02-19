@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 6.5 初始化批量操作
   initBatchActions();
 
+  // 6.6 初始化帮助面板
+  initHelp();
+
   // 7. 读取 Chrome 书签并渲染到三种布局容器
   await loadBookmarks();
 
@@ -48,6 +51,48 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 9. 注册 Chrome 书签变化监听器
   registerBookmarkListeners();
 });
+
+/**
+ * 初始化帮助面板 — 绑定帮助按钮和关闭按钮事件
+ */
+function initHelp() {
+  const btnHelp = document.getElementById('btn-help');
+  const helpOverlay = document.getElementById('help-overlay');
+  const helpCloseBtn = document.getElementById('help-close-btn');
+  const helpNoShowCheck = document.getElementById('help-no-show-check');
+
+  if (!btnHelp || !helpOverlay) return;
+
+  // 点击帮助按钮 → 打开帮助弹窗
+  btnHelp.addEventListener('click', () => {
+    helpOverlay.classList.remove('hidden');
+  });
+
+  // 关闭按钮
+  if (helpCloseBtn) {
+    helpCloseBtn.addEventListener('click', () => {
+      helpOverlay.classList.add('hidden');
+      // 保存"不再显示"偏好
+      if (helpNoShowCheck && helpNoShowCheck.checked) {
+        chrome.storage.local.set({ helpDismissed: true });
+      }
+    });
+  }
+
+  // 点击遮罩层关闭
+  helpOverlay.addEventListener('click', (e) => {
+    if (e.target === helpOverlay) {
+      helpOverlay.classList.add('hidden');
+    }
+  });
+
+  // 首次使用时自动显示帮助页
+  chrome.storage.local.get(['helpDismissed'], (data) => {
+    if (!data.helpDismissed) {
+      helpOverlay.classList.remove('hidden');
+    }
+  });
+}
 
 /**
  * 渲染问候语 — 根据当前时间显示不同问候
