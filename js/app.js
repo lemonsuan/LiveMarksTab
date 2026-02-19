@@ -307,30 +307,10 @@ function showQuickSiteDialog(editIndex) {
 }
 
 /**
- * 初始化帮助/关于弹窗
+ * 初始化帮助/关于 — 内容已整合到设置面板「关于」Tab
+ * 帮助按钮已从工具栏移除，此函数保留供参考，无需执行任何操作
  */
 function initHelp() {
-  const btn = document.getElementById('btn-help');
-  const overlay = document.getElementById('help-overlay');
-  const closeBtn = document.getElementById('help-close-btn');
-
-  if (!btn || !overlay || !closeBtn) return;
-
-  const toggleHelp = (show) => {
-    if (show) {
-      overlay.classList.remove('hidden');
-      requestAnimationFrame(() => overlay.classList.add('visible'));
-    } else {
-      overlay.classList.remove('visible');
-      setTimeout(() => overlay.classList.add('hidden'), 250);
-    }
-  };
-
-  btn.addEventListener('click', () => toggleHelp(true));
-  closeBtn.addEventListener('click', () => toggleHelp(false));
-
-  // 点击遮罩关闭
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) toggleHelp(false);
-  });
+  // 帮助内容已迁移至设置面板「关于」Tab
+  // 通过设置按钮 > 关于 Tab 访问
 }
