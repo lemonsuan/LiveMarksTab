@@ -1,28 +1,37 @@
 <!--
-  newtab.html — 新标签页主页面
+  newtab.html — LiveMarksTab 新标签页主页面 (v2 重构版)
 
   页面结构 (自上而下):
   ┌─────────────────────────────────────┐
-  │  #search-area   搜索栏（sticky）     │
+  │  .hero           搜索区（居中）      │
+  │  ├── .greeting   问候语             │
+  │  └── .search-box 搜索框             │
   ├─────────────────────────────────────┤
-  │  #bookmark-area 书签内容区           │
-  │  ├── #layout-grid    卡片网格布局     │
-  │  ├── #layout-sidebar 侧边栏布局      │
-  │  └── #layout-rows   行布局（默认）    │
+  │  .quick-access   快速访问站点网格    │
   ├─────────────────────────────────────┤
-  │  #context-menu  右键菜单（fixed）     │
-  │  #edit-overlay  编辑书签弹窗          │
-  │  #settings-overlay 设置面板          │
-  │  #settings-btn  设置悬浮按钮          │
+  │  .bookmarks      书签内容区          │
+  │  ├── #layout-grid    卡片网格布局    │
+  │  ├── #layout-sidebar 侧边栏布局     │
+  │  └── #layout-rows   行布局（默认）   │
+  ├─────────────────────────────────────┤
+  │  .toolbar-minimal   工具栏（右下角） │
+  │  #context-menu      右键菜单        │
+  │  #edit-overlay      编辑书签弹窗     │
+  │  #settings-overlay  设置面板         │
+  │  #qr-overlay        二维码弹窗       │
+  │  #cleaner-overlay   书签清理面板     │
   └─────────────────────────────────────┘
 
   JS 脚本加载顺序（有依赖关系，不可打乱）:
-  1. utils.js       — 工具函数（createElement/getFaviconUrl/debounce）
-  2. search.js      — 搜索（依赖 utils.createElement）
-  3. bookmarks.js   — 书签渲染（依赖 utils + search.SEARCH_ENGINES）
-  4. sync.js        — 同步（依赖 bookmarks.loadBookmarks）
-  5. settings.js    — 设置（依赖 search.selectEngine + search.SEARCH_ENGINES）
-  6. app.js         — 入口（调用以上所有模块的 init 函数）
+  1. utils.js       — 工具函数
+  2. theme.js       — 主题管理
+  3. search.js      — 搜索功能
+  4. qrcode.js      — 二维码生成
+  5. bookmarks.js   — 书签渲染
+  6. cleaner.js     — 书签清理
+  7. sync.js        — 同步
+  8. settings.js    — 设置面板
+  9. app.js         — 入口
 -->
 <!doctype html>
 <html lang="zh-CN" data-theme="light">
@@ -30,11 +39,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>新标签页</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <!-- CSS 模块 -->
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/search.css" />
+    <link rel="stylesheet" href="css/bookmarks.css" />
+    <link rel="stylesheet" href="css/overlay.css" />
+    <link rel="stylesheet" href="css/toolbar.css" />
   </head>
   <body>
-    <!-- ========== 搜索栏区域（固定高度） ========== -->
-    <header id="search-area">
+    <!-- ========== Hero 搜索区域 ========== -->
+    <main class="hero">
+      <div class="greeting" id="greeting"></div>
       <div class="search-container">
         <div class="search-box">
           <input
@@ -66,14 +82,21 @@
             <ul id="engine-list" class="engine-dropdown hidden"></ul>
           </div>
         </div>
-        <!-- 搜索结果提示（过滤书签时显示） -->
+        <!-- 搜索结果提示 -->
         <div id="search-hint" class="search-hint hidden"></div>
       </div>
-    </header>
+    </main>
+
+    <!-- ========== 快速访问 ========== -->
+    <section class="quick-access" id="quick-access">
+      <div class="site-grid" id="site-grid">
+        <!-- JS 动态生成 -->
+      </div>
+    </section>
 
     <!-- ========== 书签内容区 ========== -->
-    <main id="bookmark-area">
-      <!-- 布局 A: 平铺网格 -->
+    <section class="bookmarks">
+      <!-- 布局 A: 卡片网格 -->
       <div id="layout-grid" class="bookmark-layout hidden"></div>
       <!-- 布局 B: 侧边栏模式 -->
       <div id="layout-sidebar" class="bookmark-layout hidden">
@@ -82,7 +105,7 @@
       </div>
       <!-- 布局 C: 行布局（默认） -->
       <div id="layout-rows" class="bookmark-layout active"></div>
-    </main>
+    </section>
 
     <!-- ========== 右键菜单 ========== -->
     <div id="context-menu" class="context-menu hidden">
@@ -247,7 +270,7 @@
             &times;
           </button>
         </div>
-        <div class="settings-body">
+        <div class="settings-body" style="padding: 20px">
           <div class="setting-group">
             <label class="setting-label">标题</label>
             <input
@@ -274,7 +297,7 @@
       </div>
     </div>
 
-    <!-- ========== 设置浮层 ========== -->
+    <!-- ========== 设置面板 ========== -->
     <div id="settings-overlay" class="settings-overlay hidden">
       <div class="settings-panel">
         <div class="settings-header">
@@ -291,6 +314,7 @@
             </button>
             <button class="settings-tab" data-tab="layout">布局</button>
             <button class="settings-tab" data-tab="search">搜索引擎</button>
+            <button class="settings-tab" data-tab="shortcuts">快捷入口</button>
             <div class="settings-sidebar-spacer"></div>
             <button
               id="btn-reset-settings"
@@ -304,7 +328,6 @@
           <div class="settings-content">
             <!-- Tab 1: 外观 -->
             <div class="settings-tab-content active" data-tab="appearance">
-              <!-- 主题深浅切换已移至悬浮工具栏 -->
               <!-- 配色方案 -->
               <div class="setting-group">
                 <label class="setting-label">配色方案</label>
@@ -318,7 +341,6 @@
                 <div class="bg-options" id="bg-options">
                   <!-- JS 动态生成 -->
                 </div>
-                <!-- URL 输入 -->
                 <div class="bg-url-row">
                   <input
                     type="url"
@@ -327,7 +349,6 @@
                   />
                   <button id="bg-url-apply">应用</button>
                 </div>
-                <!-- 上传按钮 -->
                 <div class="bg-upload-row">
                   <button class="bg-upload-btn" id="bg-upload-btn">
                     上传本地图片
@@ -472,13 +493,23 @@
                 </div>
               </div>
             </div>
+
+            <!-- Tab 4: 快捷入口 -->
+            <div class="settings-tab-content" data-tab="shortcuts">
+              <div class="setting-group">
+                <label class="setting-label">Chrome 快捷入口</label>
+                <div class="shortcut-grid" id="shortcut-grid">
+                  <!-- JS 动态生成 -->
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ========== 悬浮工具栏（右侧居中垂直排列） ========== -->
-    <div class="float-toolbar">
+    <!-- ========== 精简悬浮工具栏 ========== -->
+    <div class="toolbar-minimal">
       <!-- 深浅切换 -->
       <button id="btn-theme-toggle" class="float-btn" title="深浅切换">
         <svg
@@ -493,65 +524,6 @@
           <path
             d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
           />
-        </svg>
-      </button>
-      <!-- 密码管理 -->
-      <button id="btn-passwords" class="float-btn" title="密码管理">
-        <svg
-          viewBox="0 0 24 24"
-          width="18"
-          height="18"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-        >
-          <rect x="3" y="11" width="18" height="11" rx="2" />
-          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-        </svg>
-      </button>
-      <!-- 浏览历史 -->
-      <button id="btn-history" class="float-btn" title="浏览历史">
-        <svg
-          viewBox="0 0 24 24"
-          width="18"
-          height="18"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="12 6 12 12 16 14" />
-        </svg>
-      </button>
-      <!-- 扩展管理 -->
-      <button id="btn-extensions" class="float-btn" title="扩展管理">
-        <svg
-          viewBox="0 0 24 24"
-          width="18"
-          height="18"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-        >
-          <path
-            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
-          />
-        </svg>
-      </button>
-      <!-- 书签清理 -->
-      <button id="btn-cleaner" class="float-btn" title="书签清理">
-        <svg
-          viewBox="0 0 24 24"
-          width="18"
-          height="18"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-        >
-          <path
-            d="M9 2l.27 1.63A7 7 0 0 0 5.16 7H3v2h1.29a7 7 0 0 0 0 6H3v2h2.16a7 7 0 0 0 4.11 3.37L9 22h6l-.27-1.63A7 7 0 0 0 18.84 17H21v-2h-1.29a7 7 0 0 0 0-6H21V7h-2.16a7 7 0 0 0-4.11-3.37L15 2H9z"
-          />
-          <circle cx="12" cy="12" r="3" />
         </svg>
       </button>
       <!-- 设置 -->
@@ -575,13 +547,10 @@
     <!-- ========== 书签清理面板 ========== -->
     <div id="cleaner-overlay" class="settings-overlay hidden">
       <div class="cleaner-panel">
-        <!-- 标题栏 -->
         <div class="cleaner-panel-header">
-          <span class="cleaner-panel-title">📡 书签可访问性检测</span>
+          <span class="cleaner-panel-title">书签可访问性检测</span>
           <button id="cleaner-close-btn" class="modal-close-btn">×</button>
         </div>
-
-        <!-- 统计卡片 -->
         <div id="cleaner-stats" class="cleaner-stats" style="display: none">
           <div class="cleaner-stat-card">
             <span class="cleaner-stat-num" id="cleaner-stat-total">—</span>
@@ -589,22 +558,20 @@
           </div>
           <div class="cleaner-stat-card ok">
             <span class="cleaner-stat-num" id="cleaner-stat-ok">—</span>
-            <span class="cleaner-stat-label">✅ 正常</span>
+            <span class="cleaner-stat-label">正常</span>
           </div>
           <div class="cleaner-stat-card error">
             <span class="cleaner-stat-num" id="cleaner-stat-error">—</span>
-            <span class="cleaner-stat-label">❌ 不可访问</span>
+            <span class="cleaner-stat-label">不可访问</span>
           </div>
           <div class="cleaner-stat-card timeout">
             <span class="cleaner-stat-num" id="cleaner-stat-timeout">—</span>
-            <span class="cleaner-stat-label">⏱ 超时</span>
+            <span class="cleaner-stat-label">超时</span>
           </div>
         </div>
-
-        <!-- 扫描按钮 + 进度条 -->
         <div class="cleaner-panel-body">
           <button id="cleaner-start" class="cleaner-start-btn">
-            🔍 开始扫描所有书签
+            开始扫描所有书签
           </button>
           <div
             id="cleaner-progress"
@@ -621,8 +588,6 @@
               >0 / 0</span
             >
           </div>
-
-          <!-- 筛选 Tab -->
           <div
             id="cleaner-filter-bar"
             class="cleaner-filter-bar"
@@ -638,17 +603,11 @@
               超时 <span class="filter-count">0</span>
             </button>
           </div>
-
-          <!-- 结果列表 -->
           <div id="cleaner-results" class="cleaner-results"></div>
-
-          <!-- 全部正常空状态 -->
           <div id="cleaner-empty" class="cleaner-empty" style="display: none">
-            🎉 所有书签均可正常访问！
+            所有书签均可正常访问！
           </div>
         </div>
-
-        <!-- 底部操作栏 -->
         <div
           id="cleaner-bottom-bar"
           class="cleaner-bottom-bar"
@@ -676,30 +635,21 @@
             </button>
           </div>
           <button id="cleaner-delete-selected" class="cleaner-delete-btn">
-            🗑️ 删除选中
+            删除选中
           </button>
         </div>
       </div>
     </div>
 
-    <!-- ========== JS 模块（顺序有依赖，不可调换） ========== -->
-    <!-- 1. 工具函数：createElement, getFaviconUrl, debounce, SVG图标 -->
+    <!-- ========== JS 模块 ========== -->
     <script src="js/utils.js"></script>
-    <!-- 1.5 主题管理：深浅切换 + 配色方案 + 背景图（需在所有UI初始化前加载） -->
     <script src="js/theme.js"></script>
-    <!-- 2. 搜索：SEARCH_ENGINES 常量 + initSearch + filterBookmarks -->
     <script src="js/search.js"></script>
-    <!-- 2.5 二维码生成器（纯 Canvas，无外部依赖） -->
     <script src="js/qrcode.js"></script>
-    <!-- 3. 书签核心：loadBookmarks + 三种布局渲染 + 右键菜单 + 编辑弹窗 -->
     <script src="js/bookmarks.js"></script>
-    <!-- 3.5 书签清理模块 -->
     <script src="js/cleaner.js"></script>
-    <!-- 4. 双向同步：Sync Lock + registerBookmarkListeners -->
     <script src="js/sync.js"></script>
-    <!-- 5. 设置面板：布局切换 + 引擎选择 + 持久化 -->
     <script src="js/settings.js"></script>
-    <!-- 6. 入口：DOMContentLoaded 后按顺序初始化各模块 -->
     <script src="js/app.js"></script>
   </body>
 </html>

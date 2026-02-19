@@ -1,0 +1,238 @@
+/*
+ * search.css — Hero 搜索区域
+ *
+ * 结构：
+ *   .hero            — 居中容器（垂直约 30% 位置）
+ *   .greeting        — 问候语
+ *   .search-box      — 搜索框（胶囊形状）
+ *   .engine-selector — 搜索引擎选择器
+ *   .search-hint     — 搜索结果提示
+ */
+
+/* ============================================
+   Hero 区域 — 搜索框居中展示
+   ============================================ */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8vh 24px 4vh;
+  animation: fadeInUp 0.4s var(--ease-out);
+}
+
+/* 问候语 */
+.greeting {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+/* 搜索容器 */
+.search-container {
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+}
+
+/* 搜索框 */
+.search-box {
+  display: flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  padding: 0 8px 0 20px;
+  height: 52px;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.search-box:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-subtle), var(--shadow-lg);
+}
+
+#search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: var(--text-primary);
+  caret-color: var(--accent);
+  font-weight: 400;
+}
+
+#search-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* 搜索引擎切换 */
+.engine-selector {
+  position: relative;
+}
+
+#engine-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+#engine-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+#engine-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+
+.arrow-icon {
+  opacity: 0.5;
+}
+
+/* 引擎下拉列表 */
+.engine-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 160px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  list-style: none;
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  animation: scaleIn 0.15s ease;
+}
+
+.engine-dropdown li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.engine-dropdown li:hover {
+  background: var(--accent-subtle);
+  color: var(--text-primary);
+}
+
+.engine-dropdown li.active {
+  color: var(--accent);
+}
+
+.engine-dropdown li img {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+
+/* 搜索提示 */
+.search-hint {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  animation: fadeInUp 0.2s ease;
+}
+
+/* ============================================
+   快速访问区域
+   ============================================ */
+.quick-access {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 32px 24px;
+}
+
+.site-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 16px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.site-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+
+.site-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.site-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.site-icon img {
+  width: 24px;
+  height: 24px;
+}
+
+.site-name {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80px;
+}
+
+/* ============================================
+   背景图兼容
+   ============================================ */
+body.has-bg .search-box,
+body.has-bg .engine-dropdown {
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+}
+
+[data-theme="dark"] body.has-bg .search-box,
+[data-theme="dark"] body.has-bg .engine-dropdown {
+  background: rgba(26, 27, 30, 0.75);
+}
+
+[data-theme="light"] body.has-bg .search-box,
+[data-theme="light"] body.has-bg .engine-dropdown {
+  background: rgba(255, 255, 255, 0.75);
+}
