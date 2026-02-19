@@ -1121,8 +1121,8 @@ body.has-bg .engine-dropdown {
    帮助/引导页
    ============================================ */
 .help-panel {
-  width: 500px;
-  max-width: 90vw;
+  width: 80%;
+  max-width: 900px;
   max-height: 85vh;
   display: flex;
   flex-direction: column;

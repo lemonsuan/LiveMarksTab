@@ -720,7 +720,7 @@
       <div class="settings-panel help-panel">
         <div class="settings-header">
           <h2>LiveMarksTab 使用指南</h2>
-          <button id="help-close" class="settings-close" title="关闭">&times;</button>
+          <button id="help-close-btn" class="modal-close-btn">×</button>
         </div>
         <div class="settings-body help-body">
           <!-- 简介 -->
@@ -816,69 +816,6 @@
               <input type="checkbox" id="help-no-show-check" />
               不再自动显示此页面
             </label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ========== 帮助/关于面板 ========== -->
-    <div id="help-overlay" class="settings-overlay hidden">
-      <div class="settings-panel help-panel">
-        <div class="settings-header">
-          <h2>关于 LiveMarksTab</h2>
-          <button id="help-close-btn" class="modal-close-btn">×</button>
-        </div>
-        <div class="settings-body help-body">
-          <div class="help-section">
-            <div class="app-logo">
-              <img src="icons/icon128.png" alt="Logo" width="64" height="64">
-              <h3>LiveMarksTab <span class="version-tag">v1.2.0</span></h3>
-              <p>极简 · 高效 · 美观的新标签页书签管理工具</p>
-            </div>
-          </div>
-
-          <div class="help-section">
-            <h4>✨ 核心功能</h4>
-            <ul class="feature-list">
-              <li><strong>三种视图布局</strong>：经典行布局、沉浸卡片网格、高效面包屑导航，满足不同场景需求。</li>
-              <li><strong>强大的搜索</strong>：支持多引擎聚合搜索、自定义搜索引擎，实时检索书签内容。</li>
-              <li><strong>个性化定制</strong>：深色模式、自定义背景壁纸、一言日签、自定义快速访问。</li>
-              <li><strong>数据安全</strong>：所有数据存储在本地，支持配置导出和书签备份，隐私无忧。</li>
-            </ul>
-          </div>
-
-          <div class="help-section">
-            <h4>⌨️ 快捷键指南</h4>
-            <div class="shortcut-list">
-              <div class="shortcut-item">
-                <span class="key">Enter</span>
-                <span class="desc">在当前引擎搜索 / 打开首个书签</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="key">Shift</span> + <span class="key">Enter</span>
-                <span class="desc">同时在所有勾选的搜索引擎中搜索</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="key">Ctrl/Cmd</span> + <span class="key">Click</span>
-                <span class="desc">多选书签（用于批量删除）</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="key">ESC</span>
-                <span class="desc">关闭弹窗 / 取消选择 / 清空搜索</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="help-section">
-            <h4>关于</h4>
-            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
-              本项目由 <strong>lemonsuan</strong> 开发维护。<br>
-              特别感谢 <a href="https://hitokoto.cn" target="_blank">Hitokoto 一言</a> 提供每日语句 API。<br>
-              <a href="https://github.com/lemonsuan/LiveMarksTab" target="_blank" class="github-link">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                GitHub 仓库
-              </a>
-            </p>
           </div>
         </div>
       </div>
