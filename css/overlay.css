@@ -422,6 +422,144 @@
 }
 
 /* ============================================
+   帮助/引导页
+   ============================================ */
+.help-panel {
+  max-width: 680px;
+  max-height: 85vh;
+}
+
+.help-body {
+  padding: 24px !important;
+  overflow-y: auto;
+  max-height: calc(85vh - 60px);
+}
+
+.help-hero {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.help-hero h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.help-hero p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.help-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.help-card {
+  padding: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition-fast);
+}
+
+.help-card:hover {
+  border-color: var(--accent);
+}
+
+.help-card-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.help-card h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.help-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.help-card li {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  padding-left: 12px;
+  position: relative;
+}
+
+.help-card li::before {
+  content: '·';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.help-section {
+  margin-bottom: 20px;
+}
+
+.help-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+
+.help-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.help-shortcut {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.help-shortcut kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 var(--border);
+  white-space: nowrap;
+}
+
+.help-footer {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.help-no-show {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* ============================================
    快捷入口 Tab
    ============================================ */
 .shortcut-grid {
@@ -977,4 +1115,159 @@ body.has-bg .engine-dropdown {
 [data-theme="light"] body.has-bg .toast,
 [data-theme="light"] body.has-bg .engine-dropdown {
   background: rgba(255, 255, 255, 0.75);
+}
+
+/* ============================================
+   帮助/引导页
+   ============================================ */
+.help-panel {
+  width: 500px;
+  max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.help-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.help-section {
+  margin-bottom: 24px;
+}
+
+.help-section:last-child {
+  margin-bottom: 0;
+}
+
+.help-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Logo 区 */
+.app-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.app-logo img {
+  margin-bottom: 12px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.app-logo h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.version-tag {
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.app-logo p {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* 功能列表 */
+.feature-list {
+  list-style: none;
+  padding: 0;
+}
+
+.feature-list li {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  line-height: 1.5;
+  padding-left: 12px;
+  position: relative;
+}
+
+.feature-list li::before {
+  content: "•";
+  color: var(--accent);
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.feature-list li strong {
+  color: var(--text-primary);
+}
+
+/* 快捷键列表 */
+.shortcut-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 6px 10px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.shortcut-item .key {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--text-primary);
+  min-width: 24px;
+  text-align: center;
+  display: inline-block;
+}
+
+.shortcut-item .desc {
+  color: var(--text-secondary);
+}
+
+/* GitHub 链接 */
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 6px 12px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+}
+
+.github-link:hover {
+  background: #24292e;
+  color: #fff;
 }

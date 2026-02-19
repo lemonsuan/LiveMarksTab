@@ -39,6 +39,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 6.5 初始化批量操作
   initBatchActions();
 
+  // 6.6 初始化帮助引导页
+  initHelp();
+
+  // 6.6 初始化帮助引导页
+  initHelp();
+
   // 7. 读取 Chrome 书签并渲染到三种布局容器
   await loadBookmarks();
 
@@ -283,8 +289,48 @@ function showQuickSiteDialog(editIndex) {
       });
 
       // 关闭弹窗
+      newSave.onclick = null; // 清理事件
       overlay.classList.remove('visible');
       setTimeout(() => overlay.classList.add('hidden'), 250);
     });
+
+    // 绑定取消按钮关闭弹窗
+    const cancelBtn = document.getElementById('edit-cancel');
+    const newCancel = cancelBtn.cloneNode(true);
+    cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+    
+    newCancel.addEventListener('click', () => {
+      overlay.classList.remove('visible');
+      setTimeout(() => overlay.classList.add('hidden'), 250);
+    });
+  });
+}
+
+/**
+ * 初始化帮助/关于弹窗
+ */
+function initHelp() {
+  const btn = document.getElementById('btn-help');
+  const overlay = document.getElementById('help-overlay');
+  const closeBtn = document.getElementById('help-close-btn');
+
+  if (!btn || !overlay || !closeBtn) return;
+
+  const toggleHelp = (show) => {
+    if (show) {
+      overlay.classList.remove('hidden');
+      requestAnimationFrame(() => overlay.classList.add('visible'));
+    } else {
+      overlay.classList.remove('visible');
+      setTimeout(() => overlay.classList.add('hidden'), 250);
+    }
+  };
+
+  btn.addEventListener('click', () => toggleHelp(true));
+  closeBtn.addEventListener('click', () => toggleHelp(false));
+
+  // 点击遮罩关闭
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) toggleHelp(false);
   });
 }
