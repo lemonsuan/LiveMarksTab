@@ -117,7 +117,7 @@ async function batchDeleteBookmarks(ids) {
     try {
       await chrome.bookmarks.remove(id);
     } catch (err) {
-      console.warn('[Cleaner] 删除失败:', id, err);
+      // console.warn('[Cleaner] 删除失败:', id, err);
     }
   }
 }

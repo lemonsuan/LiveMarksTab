@@ -30,87 +30,90 @@
    1. CSS 变量 / 设计令牌 (TabMark Style - Clean & Emerald)
    ============================================ */
 :root {
-  /* ---- 字体系统 ---- */
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* ---- 字体系统 (Literary & Round) ---- */
+  --font-serif: "Merriweather", serif;
+  --font-sans: "Nunito", "Inter", sans-serif;
   
-  /* ---- 调色板 (TabMark Palette) ---- */
-  /* 深色模式基底 (Deep Dark) */
-  --bg-primary: #1c1c1c;              /* TabMark 深色底 */
-  --bg-secondary: #242424;            /* 侧栏/搜索/弹窗 */
-  --bg-card: #242424;                 
-  --bg-card-hover: #2d2d2d;
-  --bg-input: #404040;
-  --bg-overlay: rgba(0, 0, 0, 0.7);
+  /* ---- 调色板 (Warm Organic) ---- */
+  --bg-primary: #faf6f1;   /* Warm Cream */
+  --bg-secondary: #fffcf8; /* Lighter Cream */
+  --bg-card: #fffcf8;
+  --bg-card-hover: #ffffff;
+  --bg-input: #f2efe9;
+  --bg-overlay: rgba(92, 64, 51, 0.2);
   
-  /* 边框 (Flat & Clean) */
-  --border: #404040;
-  --border-hover: #10b981;            /* 悬停变绿 */
-  --border-highlight: #10b981;
-
-  /* 文字色阶 */
-  --text-primary: #ffffff;            /* 纯白 */
-  --text-secondary: #a3a3a3;          /* Neutral-400 */
-  --text-muted: #737373;              /* Neutral-500 */
-
-  /* 主色调 (Emerald-500) */
-  --accent: #10b981;
-  --accent-hover: #059669;
-  --accent-subtle: rgba(16, 185, 129, 0.15);
-  --accent-glow: rgba(16, 185, 129, 0.4);
-
-  /* 语义色 */
-  --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.1);
-  --success: #10b981;
-  --warning: #f59e0b;
-
-  /* ---- 阴影系统 (Subtle) ---- */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+  /* 边框 (Soft Earthy) */
+  --border: #e6e2dd;
+  --border-hover: #d4a373; /* Warm Tan */
+  --border-highlight: #8b9d77; /* Sage Green */
   
-  /* Ring Focus 光圈 */
+  /* 文字 (Stone & Earth) */
+  --text-primary: #5c4033;   /* Stone Brown */
+  --text-secondary: #8c7b75; /* Warm Grey */
+  --text-muted: #b0a69e;
+  
+  /* 主色调 (Sage Green) */
+  --accent: #8b9d77;
+  --accent-hover: #7a8b69;
+  --accent-subtle: rgba(139, 157, 119, 0.15);
+  --accent-glow: rgba(139, 157, 119, 0.4);
+  
+  /* 辅助色 */
+  --color-tan: #d4a373;
+  --danger: #d97757;       /* Terracotta */
+  --danger-bg: rgba(217, 119, 87, 0.1);
+  --success: #8b9d77;
+  --warning: #e0ac00;
+
+  /* ---- 阴影系统 (Soft & Diffused) ---- */
+  --shadow-sm: 0 4px 12px -2px rgba(92, 64, 51, 0.08);
+  --shadow-md: 0 12px 24px -6px rgba(92, 64, 51, 0.12);
+  --shadow-lg: 0 20px 40px -10px rgba(92, 64, 51, 0.15);
+  --shadow-xl: 0 32px 64px -12px rgba(92, 64, 51, 0.2);
+  
   --ring-offset: 2px;
-  --ring-color: rgba(16, 185, 129, 0.5);
+  --ring-color: rgba(139, 157, 119, 0.5);
+  
+  /* ---- 形态 (Organic Shapes) ---- */
+  --search-area-height: 160px;
+  --sidebar-width: 260px;
+  --card-radius: 24px;         /* 鹅卵石圆角 */
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  --radius-full: 999px;
 
-  /* ---- 尺寸 & 倒角 (TabMark uses smaller radius) ---- */
-  --search-area-height: 140px;
-  --sidebar-width: 240px;
-  --card-radius: 8px;          /* 更方正 */
-  --radius-sm: 6px;
-  --radius-xs: 4px;
-
-  /* ---- 动效曲线 (Snappy) ---- */
-  --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
-  --ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
-  --transition-fast: 0.15s ease-out;
-  --transition-normal: 0.2s ease-out;
+  /* ---- 动效 (Slow & Natural) ---- */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.25s var(--ease-out);
+  --transition-normal: 0.4s var(--ease-out);
 }
 
 /* ============================================
-   1b. 浅色主题 (Light Mode - TabMark Clean)
+   1b. 深色主题 (Dark Organic - Deep Forest)
    ============================================ */
-[data-theme="light"] {
-  --bg-primary: #f9fafb;              /* Gray-50 */
-  --bg-secondary: #ffffff;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f3f4f6;           /* Gray-100 */
-  --bg-input: #f3f4f6;
-  --bg-overlay: rgba(0, 0, 0, 0.3);
-
-  --border: #e5e7eb;                  /* Gray-200 */
-  --border-hover: #10b981;
-  --border-highlight: #10b981;
-
-  --text-primary: #111827;            /* Gray-900 */
-  --text-secondary: #4b5563;          /* Gray-600 */
-  --text-muted: #9ca3af;              /* Gray-400 */
-
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+[data-theme="dark"] {
+  --bg-primary: #2c2420;   /* Deep Earth Brown */
+  --bg-secondary: #3a312c; /* Lighter Earth */
+  --bg-card: #3a312c;
+  --bg-card-hover: #453b35;
+  --bg-input: #453b35;
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+  
+  --border: #4a3e36;
+  --border-hover: #8b9d77;
+  --border-highlight: #8b9d77;
+  
+  --text-primary: #f2efe9; /* Warm Cream Text */
+  --text-secondary: #bea89d;
+  --text-muted: #8c7b75;
+  
+  --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 12px 24px -6px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 32px 64px -12px rgba(0, 0, 0, 0.6);
 }
 
 /* ============================================
@@ -396,7 +399,14 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.5;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
 }
 
 ::selection {
@@ -462,10 +472,10 @@ body {
   align-items: center;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
-  border-radius: 12px; /* Slightly smaller radius */
-  padding: 0 6px 0 20px;
-  height: 52px;
-  box-shadow: none; /* Remove default shadow for cleaner look */
+  border-radius: var(--radius-full); /* Capsule shape */
+  padding: 0 8px 0 24px;
+  height: 56px;
+  box-shadow: var(--shadow-sm); /* Soft shadow */
   transition: all var(--transition-normal);
 }
 
@@ -503,7 +513,7 @@ body {
   gap: 6px;
   padding: 6px 12px;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: var(--radius-full);
   background: var(--bg-card);
   color: var(--text-secondary);
   cursor: pointer;
@@ -525,8 +535,9 @@ body {
 /* 分类卡片 (TabMark Style) */
 .bookmark-card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--card-radius); /* 8px */
+  border-radius: var(--card-radius); /* 24px */
+  border: none;
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   break-inside: avoid;
   margin-bottom: 20px;
@@ -692,8 +703,9 @@ body {
 /* 分类卡片 */
 .bookmark-card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--card-radius);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   break-inside: avoid;
   margin-bottom: 20px;
@@ -853,9 +865,7 @@ body {
   color: var(--accent);
 }
 
-.folder-expand-body {
-  /* 内容自然流式显示 */
-}
+
 
 /* ---------- 布局 C: 行布局 (默认) ---------- */
 #layout-rows {
@@ -1043,9 +1053,9 @@ body {
 .sidebar-nav {
   width: var(--sidebar-width);
   flex-shrink: 0;
-  background: var(--bg-secondary);
-  border-right: 1px solid var(--border);
-  border-radius: var(--card-radius) 0 0 var(--card-radius);
+  background: transparent; /* Transparent for organic feel */
+  border-right: none;      /* Remove rigid border */
+  padding: 12px;
   overflow-y: auto;
   padding: 8px;
 }
@@ -1060,7 +1070,7 @@ body {
   font-size: 14px;
   font-weight: 500;
   transition: all var(--transition-fast);
-  border-radius: var(--radius-sm); /* TabMark style: rounded items */
+  border-radius: var(--radius-lg); /* Larger organic radius */
   margin-bottom: 4px;
   border-left: none; /* Remove previous border indicator */
 }
@@ -1098,7 +1108,9 @@ body {
 .sidebar-content {
   flex: 1;
   background: var(--bg-card);
-  border-radius: 0 var(--card-radius) var(--card-radius) 0;
+  border-radius: var(--card-radius);
+  margin: 12px; /* Floating panel */
+  box-shadow: var(--shadow-sm);
   padding: 16px 20px;
   overflow-y: auto;
 }

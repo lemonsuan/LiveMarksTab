@@ -12,7 +12,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('[App] 书签导航初始化中...');
+  // console.log('[App] 书签导航初始化中...');
 
   // 0. 主题（最先！避免页面闪白——先设 data-theme 再渲染内容）
   initTheme();
@@ -38,5 +38,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 6. 注册 Chrome 书签变化监听器（外部变更 → 刷新 UI）
   registerBookmarkListeners();
 
-  console.log('[App] 初始化完成');
+  // console.log('[App] 初始化完成');
 });
