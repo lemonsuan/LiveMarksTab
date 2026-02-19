@@ -63,33 +63,39 @@ function initHelp() {
 
   if (!btnHelp || !helpOverlay) return;
 
-  // 点击帮助按钮 → 打开帮助弹窗
-  btnHelp.addEventListener('click', () => {
+  // 打开帮助弹窗
+  function openHelp() {
     helpOverlay.classList.remove('hidden');
-  });
+    requestAnimationFrame(() => helpOverlay.classList.add('visible'));
+  }
+
+  // 关闭帮助弹窗
+  function closeHelp() {
+    helpOverlay.classList.remove('visible');
+    setTimeout(() => helpOverlay.classList.add('hidden'), 250);
+    // 保存"不再显示"偏好
+    if (helpNoShowCheck && helpNoShowCheck.checked) {
+      chrome.storage.local.set({ helpDismissed: true });
+    }
+  }
+
+  // 点击帮助按钮 → 打开
+  btnHelp.addEventListener('click', openHelp);
 
   // 关闭按钮
   if (helpCloseBtn) {
-    helpCloseBtn.addEventListener('click', () => {
-      helpOverlay.classList.add('hidden');
-      // 保存"不再显示"偏好
-      if (helpNoShowCheck && helpNoShowCheck.checked) {
-        chrome.storage.local.set({ helpDismissed: true });
-      }
-    });
+    helpCloseBtn.addEventListener('click', closeHelp);
   }
 
   // 点击遮罩层关闭
   helpOverlay.addEventListener('click', (e) => {
-    if (e.target === helpOverlay) {
-      helpOverlay.classList.add('hidden');
-    }
+    if (e.target === helpOverlay) closeHelp();
   });
 
   // 首次使用时自动显示帮助页
   chrome.storage.local.get(['helpDismissed'], (data) => {
     if (!data.helpDismissed) {
-      helpOverlay.classList.remove('hidden');
+      openHelp();
     }
   });
 }
